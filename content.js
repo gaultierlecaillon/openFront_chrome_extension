@@ -4,17 +4,45 @@ let hasPassedSeventyPercent = false;
 let hasPassedStartThreshold = false;
 let isTestMode = false; // Test mode flag
 
-// Character text mapping
-const characterTexts = {
-    mrbeast: "Hey everyone! Today we're looking at some incredible population growth!",
-    macron: "Mes amis, our population growth is truly exceptional!",
-    snoop: "Fo' shizzle, we're about to smoke the competition!",
-    freeman: "Let me tell you a story about population growth...",
-    trump: "Nobody grows population better than me, believe me!",
-    biden: "Here's the deal, folks - we're growing stronger!",
-    tate: "Top G never loses. Watch how we dominate!",
-    tyger: "Time to show them what real strategy looks like!",
-    omni: "The numbers don't lie - our growth is unstoppable!"
+// Audio file to text mapping
+const audioTexts = {
+    // MrBeast audio clips
+    'mrbeast_70percent_population_wow_thats_a_lot.mp3': "70% population ! Wow, that's a lot...",
+    'mrbeast_this_guy_has_more_pop_than_subs.mp3': "This guy has more population than I have subscribers!",
+    
+    // Snoop Dogg audio clips
+    'snoop_bro_you_are_about_to_be_smoked.mp3': "Bro, you are about to be smoked!",
+    
+    // Morgan Freeman audio clips
+    'freeman_in_the_end_its_not_the_number.mp3': "In the end, it's not the number of troops you have, it's how many you are willing to lose. And I’m willing to lose them all.",
+    
+    // Trump audio clips
+    'trump_i_didnt_just_beat_them.mp3': "I didn’t just beat them. I humiliated them. Wiped them off the map like they were never even there.",
+    'trump_listen_kid_build_expand_dominate.mp3': "Listen, kid—build, expand, dominate. It’s not rocket science, it’s winning.",
+    'trump_your_strategy_trash.mp3': "Your strategy? Trash. Mine? Pure domination. That’s why you follow and I lead.",
+    
+    // Biden audio clips
+    'biden_one_time_i_get_a_small.mp3': "One time, I get aaaaa...  A small [...] back there in the Minesota. one many. Have you seen the price of warship recently? Anyway, shold we crack a join now?",
+    
+    // Andrew Tate audio clips
+    'tate_i_left_your_base_intact.mp3': "I left your base intact. Not out of mercy—out of disrespect.",
+    'tate_i_took_your_capital_so_fast.mp3': "I took your capital so fast, I didn’t even notice you had one.",
+    'tate_while_youre_building_cities.mp3': "While you’re building cities, I’m building empires. Try to keep up, dork.",
+    
+    // tyson audio clips
+    'tyson_come_on_son_dont_save_troops.mp3': "Come on, son! Don’t save troops like it’s your fucking birthday—spend 'em and break their spine!",
+    
+    // Omni audio clips
+    'omni_you_dont_understand_this_map.mp3': "You don’t understand… this map isn’t yours to conquer. I’m gonna fucke you up.",
+    'spongebob_look_patrick_grown_man.mp3': "Haha, look Patrick, a grown-ass man playing video-games!"
+};
+
+// Start sound texts
+const startTexts = {
+    'start/alright_good_luck_out_there_champ.mp3': "Alright, good luck out there, champ!",
+    'start/good_luck_looser.mp3': "Good luck, loser!",
+    'start/hope_your_cities_fall_with_dignity.mp3': "Hope your cities fall with dignity!",
+    'start/i_want_to_play_a_game_live_or_die.mp3': "I want to play a game... Live or die, make your choice."
 };
 
 // Toggle test mode with Alt+T
@@ -34,7 +62,6 @@ document.addEventListener('keydown', (e) => {
 const startSoundFiles = [
     'start/alright_good_luck_out_there_champ.mp3',
     'start/good_luck_looser.mp3',
-    'start/haha_look_patrick_a_grown_man.mp3',
     'start/hope_your_cities_fall_with_dignity.mp3',
     'start/i_want_to_play_a_game_live_or_die.mp3'
 ];
@@ -42,7 +69,6 @@ const startSoundFiles = [
 // Regular sound files
 const soundFiles = [
     'mrbeast_70percent_population_wow_thats_a_lot.mp3',
-    'macron_starting_tomorrow_exceptional_69.mp3',
     'snoop_bro_you_are_about_to_be_smoked.mp3',
     'freeman_in_the_end_its_not_the_number.mp3',
     'trump_i_didnt_just_beat_them.mp3',
@@ -52,14 +78,35 @@ const soundFiles = [
     'tate_while_youre_building_cities.mp3',
     'tate_i_left_your_base_intact.mp3',
     'tate_i_took_your_capital_so_fast.mp3',
-    'tyger_come_on_son_dont_save_troops.mp3',
-    'omni_you_dont_understand_this_map.mp3'
+    'tyson_come_on_son_dont_save_troops.mp3',
+    'omni_you_dont_understand_this_map.mp3',
+    'spongebob_look_patrick_grown_man.mp3'
 ];
 
-// Function to play a random sound
+// Track recently played sounds to avoid repetition
+let recentlyPlayedSounds = [];
+const MAX_RECENT_SOUNDS = Math.min(5, Math.floor(soundFiles.length / 2)); // Keep track of up to 5 recent sounds or half the total
+
+// Function to play a random sound with improved randomization
 function playRandomSound() {
-    const randomIndex = Math.floor(Math.random() * soundFiles.length);
-    const soundFile = soundFiles[randomIndex];
+    // Filter out recently played sounds to avoid repetition
+    const availableSounds = soundFiles.filter(sound => !recentlyPlayedSounds.includes(sound));
+    
+    // If we've played all sounds or nearly all, reset the recently played list
+    if (availableSounds.length <= 2) {
+        recentlyPlayedSounds = [];
+    }
+    
+    // Select a random sound from available sounds
+    const randomIndex = Math.floor(Math.random() * availableSounds.length);
+    const soundFile = availableSounds[randomIndex];
+    
+    // Add to recently played list and maintain its max size
+    recentlyPlayedSounds.push(soundFile);
+    if (recentlyPlayedSounds.length > MAX_RECENT_SOUNDS) {
+        recentlyPlayedSounds.shift(); // Remove oldest sound
+    }
+    
     const audio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
     
     // Extract character name and title
@@ -77,22 +124,44 @@ function playRandomSound() {
     const audioTitle = characterContainer.querySelector('.openfront-audio-title');
     
     if (characterImg && audioTitle) {
+        // Remove fade-out class if present
+        characterContainer.classList.remove('fade-out');
+        
         // Show container and update image
         characterContainer.style.display = characterName ? 'flex' : 'none';
         characterImg.src = chrome.runtime.getURL(`img/characters/${characterName}.webp`);
         characterImg.style.display = characterName ? 'block' : 'none';
         
-        // Get character-specific text or use default
-        const characterText = characterTexts[characterName] || title.replace('.mp3', '');
+        // Get audio-specific text or use default
+        const audioText = audioTexts[soundFile] || title.replace('.mp3', '');
         
         // Create typing animation container
-        audioTitle.innerHTML = `<span class="typing-text">${characterText}</span>`;
+        audioTitle.innerHTML = `<span class="typing-text">${audioText}</span>`;
         
-        // Reset animation if text changes
-        const typingElement = audioTitle.querySelector('.typing-text');
-        typingElement.style.animation = 'none';
-        typingElement.offsetHeight; // Trigger reflow
-        typingElement.style.animation = null;
+        // Play audio and get duration
+        audio.addEventListener('loadedmetadata', () => {
+            // Set typing animation duration to match audio duration
+            const typingElement = audioTitle.querySelector('.typing-text');
+            if (typingElement) {
+                const audioDuration = audio.duration;
+                const typingDuration = audioDuration * 0.9; // 90% of audio duration
+                typingElement.style.animation = `typing ${typingDuration}s steps(${audioText.length * 2}, end), blink-caret 0.75s step-end infinite`;
+            }
+        });
+        
+        // Add event listener to hide container when audio ends (with 5s delay)
+        audio.addEventListener('ended', () => {
+            // Wait 5 seconds before starting fade-out
+            setTimeout(() => {
+                // Add fade-out class to smoothly hide the container
+                characterContainer.classList.add('fade-out');
+                
+                // Hide container after fade-out animation completes
+                setTimeout(() => {
+                    characterContainer.style.display = 'none';
+                }, 500); // Match the transition duration in CSS
+            }, 5000); // 5 second delay before hiding
+        });
     }
     
     audio.play().catch(error => console.error('Error playing sound:', error));
@@ -107,7 +176,7 @@ function setupNextSoundInterval() {
         clearTimeout(soundIntervalId);
     }
     
-    const delay = isTestMode ? 10000 : // 15 seconds in test mode
+    const delay = isTestMode ? 15000 : // 15 seconds in test mode
         Math.floor(Math.random() * (5 * 60 * 1000 - 2 * 60 * 1000 + 1)) + 2 * 60 * 1000; // 2-5 minutes normally
     
     soundIntervalId = setTimeout(() => {
@@ -184,18 +253,38 @@ function updateDisplay() {
                 const soundFile = startSoundFiles[randomStartIndex];
                 const startAudio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
                 
-                // Hide character container and update title for start sounds
-                characterContainer.style.display = 'none';
+                // Show character container for start sounds
+                characterContainer.classList.remove('fade-out');
+                characterContainer.style.display = 'flex';
+                
                 const audioTitle = characterContainer.querySelector('.openfront-audio-title');
                 if (audioTitle) {
-                    const startText = soundFile.replace('start/', '').replace('.mp3', '');
+                    const startText = startTexts[soundFile] || soundFile.replace('start/', '').replace('.mp3', '');
                     audioTitle.innerHTML = `<span class="typing-text">${startText}</span>`;
                     
-                    // Reset animation
-                    const typingElement = audioTitle.querySelector('.typing-text');
-                    typingElement.style.animation = 'none';
-                    typingElement.offsetHeight; // Trigger reflow
-                    typingElement.style.animation = null;
+                    // Set typing animation duration to match audio duration
+                    startAudio.addEventListener('loadedmetadata', () => {
+                        const typingElement = audioTitle.querySelector('.typing-text');
+                        if (typingElement) {
+                            const audioDuration = startAudio.duration;
+                            const typingDuration = audioDuration * 0.9; // 90% of audio duration
+                            typingElement.style.animation = `typing ${typingDuration}s steps(${startText.length * 2}, end), blink-caret 0.75s step-end infinite`;
+                        }
+                    });
+                    
+                    // Add event listener to hide container when audio ends (with 5s delay)
+                    startAudio.addEventListener('ended', () => {
+                        // Wait 3 seconds before starting fade-out
+                        setTimeout(() => {
+                            // Add fade-out class to smoothly hide the container
+                            characterContainer.classList.add('fade-out');
+                            
+                            // Hide container after fade-out animation completes
+                            setTimeout(() => {
+                                characterContainer.style.display = 'none';
+                            }, 500); // Match the transition duration in CSS
+                        }, 3000); // 3 second delay before hiding
+                    });
                 }
                 
                 startAudio.play().catch(error => console.error('Error playing start sound:', error));

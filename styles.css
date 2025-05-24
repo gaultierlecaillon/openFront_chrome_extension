@@ -36,6 +36,11 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(4px);
   z-index: 9999;
+  transition: opacity 0.5s ease;
+}
+
+.openfront-character-container.fade-out {
+  opacity: 0;
 }
 
 .openfront-population-display.hidden {
@@ -76,14 +81,20 @@
 .openfront-audio-title {
   margin-left: 8px;
   font-style: italic;
-  opacity: 0.8;
   min-width: 200px;
   display: inline-block;
+  color: white;
+  font-weight: bold;
 }
 
 @keyframes typing {
   from { width: 0 }
   to { width: 100% }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .typing-text {
@@ -94,6 +105,8 @@
   animation: typing 1.5s steps(40, end),
              blink-caret 0.75s step-end infinite;
   margin: 0;
+  color: white;
+  font-weight: bold;
 }
 
 @keyframes blink-caret {
