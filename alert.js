@@ -1,6 +1,11 @@
 // Create an audio context for generating sound
 let audioContext = null;
 
+/**
+ * Creates a beep sound with the specified frequency and duration
+ * @param {number} frequency - The frequency of the sound in Hz
+ * @param {number} duration - The duration of the sound in ms
+ */
 function createBeepSound(frequency = 800, duration = 500) {
     if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -24,16 +29,18 @@ function createBeepSound(frequency = 800, duration = 500) {
     }, duration);
 }
 
-function createFiftyPercentSound() {
+/**
+ * Creates a sound for the 50% population threshold
+ */
+export function createFiftyPercentSound() {
     createBeepSound(800, 500); // Single beep at 800Hz
 }
 
-function createSeventyPercentSound() {
+/**
+ * Creates a sound for the 70% population threshold
+ */
+export function createSeventyPercentSound() {
     // Create a double beep at a higher frequency
     createBeepSound(1000, 200);
     setTimeout(() => createBeepSound(1000, 200), 250);
 }
-
-// Make functions available globally
-window.createFiftyPercentSound = createFiftyPercentSound;
-window.createSeventyPercentSound = createSeventyPercentSound;
