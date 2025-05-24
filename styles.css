@@ -3,6 +3,9 @@
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 8px 16px;
@@ -42,4 +45,17 @@
   font-weight: 700;
   color: #60a5fa;  /* blue-400 */
   margin: 0 2px;
+}
+
+.openfront-character-image {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.openfront-audio-title {
+  margin-left: 8px;
+  font-style: italic;
+  opacity: 0.8;
 }

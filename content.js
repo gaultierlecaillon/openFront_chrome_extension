@@ -1,30 +1,63 @@
 // State tracking
 let hasPassedFiftyPercent = false;
 let hasPassedSeventyPercent = false;
+let hasPassedStartThreshold = false;
 
-// Available sound files
+// Start sound files
+const startSoundFiles = [
+    'start/Alright, good luck out there, champ.mp3',
+    'start/Good luck looser.mp3',
+    'start/Haha, look Patrick, a grown-ass man .mp3',
+    'start/Hope your cities fall with dignity.mp3',
+    'start/I want to play a game...Live or die.mp3'
+];
+
+// Regular sound files
 const soundFiles = [
-    '70% population wow, that\'s a lot !!.mp3',
-    'À partir de demain, une taxe excepti.mp3',
-    'Bro, your are about to be smoked.mp3',
-    'Champions don\'t sit back.mp3',
-    'Come on, son! Don\'t save troops like.mp3',
-    'I didn\'t just beat them.mp3',
-    'In the end, it\'s not the number of t.mp3',
-    'Listen, kid—build, expand, dominate.mp3',
-    'one time, I get a... A small.mp3',
-    'Starting tomorrow, an exceptional 69.mp3',
-    'This guy has more pop than I have su.mp3',
-    'While you’re building cities, I’m bu.mp3',
-    'I left your base intact.mp3',
-    'I took your capital so fast, I didn’.mp3',
-    'You don’t understand… this map isn’t.mp3' 
+    'mrbeast_70% population wow, that\'s a lot !!.mp3',
+    'macronStarting tomorrow, an exceptional 69.mp3',
+    'snoop_Bro, your are about to be smoked.mp3',
+    'freeman_In the end, it\'s not the number of t.mp3',
+    'trump_I didn\'t just beat them.mp3',
+    'trump_Listen, kid—build, expand, dominate.mp3',
+    'biden_one time, I get a... A small.mp3',
+    'mrbeast_This guy has more pop than I have su.mp3',
+    'tate_While you\'re building cities, I\'m bu.mp3',
+    'tate_I left your base intact.mp3',
+    'tate_I took your capital so fast, I didn\'.mp3',
+    'tyger_Come on, son! Don\'t save troops like.mp3',
+    'You don\'t understand… this map isn\'t.mp3'
 ];
 
 // Function to play a random sound
 function playRandomSound() {
     const randomIndex = Math.floor(Math.random() * soundFiles.length);
-    const audio = new Audio(chrome.runtime.getURL(`mp3/${soundFiles[randomIndex]}`));
+    const soundFile = soundFiles[randomIndex];
+    const audio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
+    
+    // Extract character name and title
+    const parts = soundFile.split('_');
+    let characterName = '';
+    let title = soundFile;
+    
+    if (parts.length > 1) {
+        characterName = parts[0];
+        title = parts.slice(1).join('_');
+    }
+    
+    // Update display with character image if available
+    const characterImg = display.querySelector('.openfront-character-image');
+    if (characterImg) {
+        characterImg.src = chrome.runtime.getURL(`img/characters/${characterName}.webp`);
+        characterImg.style.display = characterName ? 'block' : 'none';
+    }
+    
+    // Update audio title
+    const audioTitle = display.querySelector('.openfront-audio-title');
+    if (audioTitle) {
+        audioTitle.textContent = title.replace('.mp3', '');
+    }
+    
     audio.play().catch(error => console.error('Error playing sound:', error));
 }
 
@@ -42,7 +75,13 @@ function setupNextSoundInterval() {
 // Create and inject the display element
 const display = document.createElement('div');
 display.className = 'openfront-population-display hidden';
-display.innerHTML = `Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)`;
+display.innerHTML = `
+    <img class="openfront-character-image" style="display: none;">
+    <div>
+        Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
+        <span class="openfront-audio-title"></span>
+    </div>
+`;
 document.body.appendChild(display);
 
 // Function to extract population value from the DOM
@@ -85,6 +124,22 @@ function updateDisplay() {
             const totalNum = parseFloat(total.replace('K', ''));
             const percentage = totalNum > 0 ? Math.round((currentNum / totalNum) * 100) : 0;
             percentElement.textContent = `${percentage}%`;
+
+            // Play start sound when crossing 2.5K
+            if (currentNum >= 2.5 && !hasPassedStartThreshold) {
+                hasPassedStartThreshold = true;
+                const randomStartIndex = Math.floor(Math.random() * startSoundFiles.length);
+                const soundFile = startSoundFiles[randomStartIndex];
+                const startAudio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
+                
+                // Clear previous character image and title for start sounds
+                const characterImg = display.querySelector('.openfront-character-image');
+                const audioTitle = display.querySelector('.openfront-audio-title');
+                if (characterImg) characterImg.style.display = 'none';
+                if (audioTitle) audioTitle.textContent = soundFile.replace('start/', '').replace('.mp3', '');
+                
+                startAudio.play().catch(error => console.error('Error playing start sound:', error));
+            }
 
             // Play sounds when crossing thresholds
             if (percentage >= 70 && !hasPassedSeventyPercent) {

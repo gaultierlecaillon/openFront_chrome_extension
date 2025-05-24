@@ -3,7 +3,7 @@
   "name": "OpenFront Population Display",
   "version": "1.0",
   "description": "Displays population value from OpenFront.io games",
-  "permissions": ["activeTab"],
+  "permissions": [],
   "content_scripts": [
     {
       "matches": ["https://openfront.io/*"],
