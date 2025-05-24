@@ -1,10 +1,10 @@
 // Audio data and alert functions are loaded from audioData.js and alert.js
 
 // State tracking
-let hasPassedFiftyPercent = false;
+let hasPassedSixtyPercent = false;
 let hasPassedSeventyPercent = false;
 let hasPassedStartThreshold = false;
-let isTestMode = false; // Test mode flag
+let isExtensionEnabled = false; // Extension is disabled by default
 
 // Track recently played sounds to avoid repetition
 let recentlyPlayedSounds = [];
@@ -103,6 +103,7 @@ function playRandomSound() {
     playSpecificSound(soundFile);
 }
 
+
 /**
  * Plays a start sound
  */
@@ -111,15 +112,39 @@ function playStartSound() {
     const soundFile = startSoundFiles[randomStartIndex];
     const startAudio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
     
-    // Show character container for start sounds
-    characterContainer.classList.remove('fade-out');
-    characterContainer.style.display = 'flex';
+    // Extract character name from the sound file
+    // Format is typically: start/charactername_rest_of_filename.mp3
+    const filenameWithoutPath = soundFile.replace('start/', '');
+    const parts = filenameWithoutPath.split('_');
+    let characterName = '';
     
+    if (parts.length > 0) {
+        characterName = parts[0];
+        console.log(`Start sound character: ${characterName}`);
+    }
+    
+    // Update character container and image
+    const characterImg = characterContainer.querySelector('.openfront-character-image');
     const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-    if (audioTitle) {
+    
+    if (characterImg && audioTitle) {
+        // Remove fade-out class if present
+        characterContainer.classList.remove('fade-out');
+        
+        // Show container and update image
+        characterContainer.style.display = 'flex';
+        
+        // Set character image if we have a character name
+        if (characterName) {
+            characterImg.src = chrome.runtime.getURL(`img/characters/${characterName}.webp`);
+            characterImg.style.display = 'block';
+        } else {
+            characterImg.style.display = 'none';
+        }
+        
         // Get the text for this sound file
         // The keys in startTexts match the file paths in startSoundFiles
-        const startText = startTexts[soundFile] || soundFile.replace('start/', '').replace('.mp3', '');
+        const startText = startTexts[soundFile] || filenameWithoutPath.replace('.mp3', '');
         audioTitle.innerHTML = `<span class="typing-text">${startText}</span>`;
         
         // Set typing animation duration to match audio duration
@@ -154,17 +179,26 @@ function playStartSound() {
  * Sets up the next random interval for sound playback
  */
 function setupNextSoundInterval() {
+    // Always clear any existing interval first
     if (soundIntervalId) {
         clearTimeout(soundIntervalId);
+        soundIntervalId = null;
     }
     
-    const delay = isTestMode ? 15000 : // 15 seconds in test mode
-        Math.floor(Math.random() * (5 * 60 * 1000 - 2 * 60 * 1000 + 1)) + 2 * 60 * 1000; // 2-5 minutes normally
-    
-    soundIntervalId = setTimeout(() => {
-        playRandomSound();
-        setupNextSoundInterval(); // Set up next interval
-    }, delay);
+    // Only set up a new interval if extension is enabled
+    if (isExtensionEnabled) {
+        // Random interval between min_interval and max_interval
+        const min_interval = 60 * 1000; // 1 minute
+        const max_interval = 2 * 60 * 1000; // 2 minutes
+        const delay = Math.floor(Math.random() * (max_interval - min_interval + 1)) + min_interval;
+        
+        console.log(`Setting up next sound interval in ${Math.round(delay/1000)} seconds`);
+        
+        soundIntervalId = setTimeout(() => {
+            playRandomSound();
+            setupNextSoundInterval(); // Set up next interval
+        }, delay);
+    }
 }
 
 /**
@@ -197,6 +231,19 @@ function extractPopulation() {
  * Updates the population display
  */
 function updateDisplay() {
+    // Update display content based on extension state
+    if (!isExtensionEnabled) {
+        // When disabled, just show the disabled message
+        display.innerHTML = `
+            <div class="openfront-stats">
+                OpenFront Extension: disabled (press: ALT + T)
+            </div>
+        `;
+        display.classList.remove('hidden'); // Always show the disabled message
+        return;
+    }
+    
+    // When enabled, show the population stats
     const { current, total } = extractPopulation();
     const currentElement = display.querySelector('.value');
     const totalElement = display.querySelector('.total-value');
@@ -213,40 +260,51 @@ function updateDisplay() {
             const percentage = totalNum > 0 ? Math.round((currentNum / totalNum) * 100) : 0;
             percentElement.textContent = `${percentage}%`;
 
-            // Play start sound when crossing 2.5K
-            if (currentNum >= 2.5 && !hasPassedStartThreshold) {
-                hasPassedStartThreshold = true;
-                playStartSound();
-            }
-
-            // Play sounds when crossing thresholds
-            if (percentage >= 70 && !hasPassedSeventyPercent) {
-                hasPassedSeventyPercent = true;
-                // Play both the beep sound and the character sound
-                createSeventyPercentSound();
-                // Play 70% population sound if available
-                const seventyPercentSound = 'mrbeast_70percent_population_wow_thats_a_lot.mp3';
-                if (soundFiles.includes(seventyPercentSound)) {
-                    playSpecificSound(seventyPercentSound);
+            // Only play sounds if extension is enabled
+            if (isExtensionEnabled) {
+                // Play start sound when crossing 2.5K (only once)
+                if (currentNum >= 2.5 && !hasPassedStartThreshold) {
+                    hasPassedStartThreshold = true;
+                    console.log('Playing start sound (2.5K threshold)');
+                    playStartSound();
+                } else if (currentNum < 2.5) {
+                    // Reset the flag if population drops below threshold
+                    hasPassedStartThreshold = false;
                 }
-            } else if (percentage < 70) {
-                hasPassedSeventyPercent = false;
-            }
 
-            if (percentage >= 50 && !hasPassedFiftyPercent) {
-                hasPassedFiftyPercent = true;
-                // Play both the beep sound and a random character sound
-                createFiftyPercentSound();
-                // Play a random sound for 50% threshold
-                playRandomSound();
-            } else if (percentage < 50) {
-                hasPassedFiftyPercent = false;
+                // Play sounds when crossing 70% threshold (only once)
+                if (percentage >= 70 && !hasPassedSeventyPercent) {
+                    hasPassedSeventyPercent = true;
+                    console.log('Playing 70% threshold sound');
+                    
+                    // Play 70% population sound if available
+                    const seventyPercentSound = 'mrbeast_70percent_population_wow_thats_a_lot.mp3';
+                    if (soundFiles.includes(seventyPercentSound)) {
+                        playSpecificSound(seventyPercentSound);
+                    }
+                } else if (percentage < 70) {
+                    // Reset the flag if percentage drops below threshold
+                    hasPassedSeventyPercent = false;
+                }
+                
+                // Play sound when crossing 60% threshold (only once)
+                if (percentage >= 60 && !hasPassedSixtyPercent) {
+                    hasPassedSixtyPercent = true;
+                    console.log('Playing 60% threshold sound');
+                    
+                    // Play the 60% sound
+                    const sixtyPercentSound = new Audio(chrome.runtime.getURL('mp3/sound/60%.mp3'));
+                    sixtyPercentSound.play().catch(error => console.error('Error playing 60% sound:', error));
+                } else if (percentage < 60) {
+                    // Reset the flag if percentage drops below threshold
+                    hasPassedSixtyPercent = false;
+                }
             }
         }
     }
 
-    // Show display if we're on a game page or in test mode
-    const shouldShow = isTestMode || window.location.pathname.includes('/join/');
+    // Show display if we're on a game page
+    const shouldShow = window.location.pathname.includes('/join/');
     display.classList.toggle('hidden', !shouldShow);
 }
 
@@ -270,11 +328,21 @@ characterContainer.innerHTML = `
 `;
 document.body.appendChild(characterContainer);
 
-// Toggle test mode with Alt+T
+// Toggle extension enabled/disabled with Alt+T
 document.addEventListener('keydown', (e) => {
     if (e.altKey && e.key.toLowerCase() === 't') {
-        isTestMode = !isTestMode;
-        console.log('Test mode:', isTestMode ? 'ON' : 'OFF');
+        isExtensionEnabled = !isExtensionEnabled;
+        console.log('OpenFront Extension:', isExtensionEnabled ? 'ENABLED' : 'DISABLED');
+        
+        // Reset display content
+        if (isExtensionEnabled) {
+            display.innerHTML = `
+                <div class="openfront-stats">
+                    Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
+                </div>
+            `;
+        }
+        
         updateDisplay(); // Update display immediately
         
         // Reset and restart sound interval with new timing

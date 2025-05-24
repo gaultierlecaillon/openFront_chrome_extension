@@ -35,23 +35,30 @@ const audioTexts = {
     'omni_you_dont_understand_this_map.mp3': "You don't understand… this map isn't yours to conquer. I'm gonna fucke you up.",
     
     // Spongebob audio clips
-    'spongebob_look_patrick_grown_man.mp3': "Haha, look Patrick, a grown-ass man playing video-games!"
+    'spongebob_look_patrick_grown_man.mp3': "Haha, look Patrick, a grown-ass man playing video-games!",
+
+    // Rick & Morty
+    'rick_hope_your_cities_fall_with_dignity.mp3': "Hope your cities fall with dignity! Unlike you...",
+
+    //Elon Musk
+    'elon_if_i_made_an_ai_to_mimic_your_gameplay.mp3': "If I made an AI to mimic your gameplay, I’d call it GPT-Zero.",
+
+    // Walter White
+    'walter_you_clearly_dont_know_who_youre_expecting.mp3': "You clearly don’t know who you’re expanding against. I’m not just another player. I’m the one who knocks."
 };
 
 // Start sound texts
 const startTexts = {
-    'start/Alright, good luck out there, champ.mp3': "Alright, good luck out there, champ!",
-    'start/Good luck looser.mp3': "Good luck, loser!",
-    'start/Hope your cities fall with dignity.mp3': "Hope your cities fall with dignity!",
-    'start/I want to play a game...Live or die.mp3': "I want to play a game... Live or die, make your choice."
+    'start/rick_good_luck_champ.mp3': "Alright, good luck out there, champ... you're gonna need it. I mean, seriously, watching you play strategy is like watching a potato try to do calculus. But hey—miracles happen, right? Now go lose with style, commander dumbass.",
+    'start/jigsaw_play_a_game_live_or_die.mp3': "I want to play a game... Live or die, make your choice.",
+    'start/tate_good_luck_loser.mp3': "Good luck loser ! While you're playing video-games, I'll fuck your bitch 😏"
 };
 
 // Start sound files
 const startSoundFiles = [
-    'start/Alright, good luck out there, champ.mp3',
-    'start/Good luck looser.mp3',
-    'start/Hope your cities fall with dignity.mp3',
-    'start/I want to play a game...Live or die.mp3'
+    'start/rick_good_luck_champ.mp3',
+    'start/tate_good_luck_loser.mp3',
+    'start/jigsaw_play_a_game_live_or_die.mp3'
 ];
 
 // Regular sound files
@@ -68,5 +75,8 @@ const soundFiles = [
     'tate_i_took_your_capital_so_fast.mp3',
     'tyson_come_on_son_dont_save_troops.mp3',
     'omni_you_dont_understand_this_map.mp3',
-    'spongebob_look_patrick_grown_man.mp3'
+    'spongebob_look_patrick_grown_man.mp3',
+    'rick_hope_your_cities_fall_with_dignity.mp3',
+    'elon_if_i_made_an_ai_to_mimic_your_gameplay.mp3',
+    'walter_you_clearly_dont_know_who_youre_expecting.mp3'
 ];
