@@ -39,6 +39,27 @@
   transition: opacity 0.5s ease;
 }
 
+.openfront-lofi-container {
+  position: fixed;
+  top: 150px; /* Position 150px from the top as requested */
+  right: 20px;
+  display: flex !important; /* Always display the lofi button */
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 10000; /* Higher z-index to ensure it's always on top */
+  transition: opacity 0.5s ease;
+  cursor: pointer;
+}
+
+.openfront-lofi-container:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
 .openfront-character-container.fade-out {
   opacity: 0;
 }

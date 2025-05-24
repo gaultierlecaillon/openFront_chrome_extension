@@ -3,6 +3,12 @@
  * Contains mappings of audio files to their text transcriptions and lists of available sound files
  */
 
+// Lofi hip hop girl text states
+const lofiTexts = {
+    'playing': "Stop, I need to focus",
+    'stopped': "Brings the Chill Vibes"
+};
+
 // Audio file to text mapping
 const audioTexts = {
     // MrBeast audio clips

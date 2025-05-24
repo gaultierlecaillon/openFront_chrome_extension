@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenFront Extension Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .game-container {
+            width: 80%;
+            height: 80%;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+        }
+        
+        /* Extension Styles */
+        .openfront-population-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            z-index: 9999;
+            transition: opacity 0.3s ease;
+        }
+
+        .openfront-stats {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+        }
+
+        .openfront-character-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .openfront-lofi-container {
+            position: fixed;
+            top: 200px; /* Position 200px from the top as requested */
+            right: 20px;
+            display: flex !important; /* Always display the lofi button */
+            align-items: center;
+            gap: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 10000; /* Higher z-index to ensure it's always on top */
+            transition: opacity 0.5s ease;
+            cursor: pointer;
+        }
+
+        .openfront-lofi-container:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .openfront-character-image {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .openfront-audio-title {
+            margin-left: 8px;
+            font-style: italic;
+            min-width: 200px;
+            display: inline-block;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        .typing-text {
+            display: inline-block;
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #60a5fa;
+            animation: typing 1.5s steps(40, end),
+                        blink-caret 0.75s step-end infinite;
+            margin: 0;
+            color: white;
+            font-weight: bold;
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #60a5fa }
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            background-color: #4a4a4a;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #5a5a5a;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>OpenFront Extension Test</h1>
+        <p>This page simulates the OpenFront game environment to test the extension.</p>
+        <div class="controls">
+            <button id="toggleLofi">Toggle Lofi Button</button>
+            <button id="toggleCharacter">Show Character</button>
+        </div>
+    </div>
+    
+    <!-- Extension Elements -->
+    <div class="openfront-population-display">
+        <div class="openfront-stats">
+            Population: <span class="value">5.2K</span> / <span class="total-value">7.5K</span> (<span class="percent-value">69%</span>)
+        </div>
+    </div>
+    
+    <div class="openfront-character-container" style="display: none;">
+        <img class="openfront-character-image" src="img/characters/mrbeast.webp">
+        <span class="openfront-audio-title"><span class="typing-text">70% population ! Wow, that's a lot...</span></span>
+    </div>
+    
+    <div class="openfront-lofi-container" id="lofiContainer">
+        <img class="openfront-character-image" src="img/characters/lofigirl.webp">
+        <span class="openfront-audio-title"><span class="typing-text">Brings the Chill Vibes</span></span>
+    </div>
+    
+    <script>
+        // Test functionality
+        let isLofiPlaying = false;
+        let lofiAudio = null;
+        
+        document.getElementById('lofiContainer').addEventListener('click', () => {
+            if (isLofiPlaying) {
+                // Stop the music by removing the iframe
+                const existingIframe = document.getElementById('lofi-iframe');
+                if (existingIframe) {
+                    existingIframe.remove();
+                }
+                
+                isLofiPlaying = false;
+                
+                // Update button text
+                const lofiText = document.querySelector('#lofiContainer .openfront-audio-title');
+                if (lofiText) {
+                    lofiText.innerHTML = `<span class="typing-text">Brings the Chill Vibes</span>`;
+                }
+            } else {
+                // Create and add the YouTube iframe
+                const iframe = document.createElement('iframe');
+                iframe.id = 'lofi-iframe';
+                iframe.width = '0';  // Hidden but still playing audio
+                iframe.height = '0';
+                iframe.style.position = 'absolute';
+                iframe.style.bottom = '0';
+                iframe.style.right = '0';
+                iframe.style.opacity = '0.01';  // Nearly invisible but still functional
+                iframe.style.pointerEvents = 'none';  // Prevent interaction
+                iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+                iframe.src = 'https://www.youtube.com/embed/jfKfPfyJRdk?si=OmegLvyuJMmQg_EK&autoplay=1&mute=0';
+                iframe.title = 'Lofi Hip Hop Radio';
+                iframe.frameBorder = '0';
+                
+                document.body.appendChild(iframe);
+                
+                isLofiPlaying = true;
+                
+                // Update button text
+                const lofiText = document.querySelector('#lofiContainer .openfront-audio-title');
+                if (lofiText) {
+                    lofiText.innerHTML = `<span class="typing-text">Stop, I need to focus</span>`;
+                }
+                
+                console.log('Lofi music started with YouTube embed');
+            }
+        });
+        
+        document.getElementById('toggleLofi').addEventListener('click', () => {
+            const lofiContainer = document.querySelector('.openfront-lofi-container');
+            if (lofiContainer.style.display === 'none') {
+                lofiContainer.style.display = 'flex';
+            } else {
+                lofiContainer.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('toggleCharacter').addEventListener('click', () => {
+            const characterContainer = document.querySelector('.openfront-character-container');
+            if (characterContainer.style.display === 'none') {
+                characterContainer.style.display = 'flex';
+            } else {
+                characterContainer.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

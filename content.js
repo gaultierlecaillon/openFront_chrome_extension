@@ -5,6 +5,8 @@ let hasPassedSixtyPercent = false;
 let hasPassedSeventyPercent = false;
 let hasPassedStartThreshold = false;
 let isExtensionEnabled = false; // Extension is disabled by default
+let isLofiPlaying = false; // Track if lofi music is playing
+let lofiAudio = null; // Reference to the lofi audio element
 
 // Track recently played sounds to avoid repetition
 let recentlyPlayedSounds = [];
@@ -308,6 +310,54 @@ function updateDisplay() {
     display.classList.toggle('hidden', !shouldShow);
 }
 
+/**
+ * Toggles the lofi hip hop music
+ */
+function toggleLofiMusic() {
+    if (isLofiPlaying) {
+        // Stop the music by removing the iframe
+        const existingIframe = document.getElementById('lofi-iframe');
+        if (existingIframe) {
+            existingIframe.remove();
+        }
+        
+        isLofiPlaying = false;
+        
+        // Update button text
+        const lofiText = lofiContainer.querySelector('.openfront-audio-title');
+        if (lofiText) {
+            lofiText.innerHTML = `<span class="typing-text">${lofiTexts.stopped}</span>`;
+        }
+    } else {
+        // Create and add the YouTube iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'lofi-iframe';
+        iframe.width = '0';  // Hidden but still playing audio
+        iframe.height = '0';
+        iframe.style.position = 'absolute';
+        iframe.style.bottom = '0';
+        iframe.style.right = '0';
+        iframe.style.opacity = '0.01';  // Nearly invisible but still functional
+        iframe.style.pointerEvents = 'none';  // Prevent interaction
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.src = 'https://www.youtube.com/embed/jfKfPfyJRdk?si=OmegLvyuJMmQg_EK&autoplay=1&mute=0';
+        iframe.title = 'Lofi Hip Hop Radio';
+        iframe.frameBorder = '0';
+        
+        document.body.appendChild(iframe);
+        
+        isLofiPlaying = true;
+        
+        // Update button text
+        const lofiText = lofiContainer.querySelector('.openfront-audio-title');
+        if (lofiText) {
+            lofiText.innerHTML = `<span class="typing-text">${lofiTexts.playing}</span>`;
+        }
+        
+        console.log('Lofi music started with YouTube embed');
+    }
+}
+
 // Create and inject display elements
 const display = document.createElement('div');
 display.className = 'openfront-population-display hidden';
@@ -327,6 +377,30 @@ characterContainer.innerHTML = `
     <span class="openfront-audio-title"></span>
 `;
 document.body.appendChild(characterContainer);
+
+// Create and inject lofi button container - always visible regardless of extension state
+const lofiContainer = document.createElement('div');
+lofiContainer.className = 'openfront-lofi-container';
+lofiContainer.innerHTML = `
+    <img class="openfront-character-image" src="${chrome.runtime.getURL('img/characters/lofigirl.webp')}">
+    <span class="openfront-audio-title"><span class="typing-text">${lofiTexts.stopped}</span></span>
+`;
+document.body.appendChild(lofiContainer);
+
+// Make sure the lofi button is always visible
+console.log('Lofi button added to page');
+
+// Ensure the lofi button is added to the page after a short delay
+// This helps with pages that might load dynamically or have complex DOM structures
+setTimeout(() => {
+    if (!document.body.contains(lofiContainer)) {
+        console.log('Lofi button was not found, adding it again');
+        document.body.appendChild(lofiContainer);
+    }
+}, 2000);
+
+// Add click event listener to lofi container
+lofiContainer.addEventListener('click', toggleLofiMusic);
 
 // Toggle extension enabled/disabled with Alt+T
 document.addEventListener('keydown', (e) => {
@@ -365,6 +439,13 @@ window.addEventListener('unload', () => {
     clearInterval(updateInterval);
     display.remove();
     characterContainer.remove();
+    lofiContainer.remove();
+    
+    // Remove lofi iframe if it exists
+    const lofiIframe = document.getElementById('lofi-iframe');
+    if (lofiIframe) {
+        lofiIframe.remove();
+    }
 });
 
 // Update when URL changes (for single-page app navigation)
@@ -374,5 +455,11 @@ setInterval(() => {
     if (currentPath !== lastPath) {
         lastPath = currentPath;
         updateDisplay();
+        
+        // Ensure lofi button is still in the DOM after page navigation
+        if (!document.body.contains(lofiContainer)) {
+            console.log('Lofi button was removed, re-adding it');
+            document.body.appendChild(lofiContainer);
+        }
     }
 }, 500);
