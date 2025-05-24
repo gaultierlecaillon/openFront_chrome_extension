@@ -2,31 +2,58 @@
 let hasPassedFiftyPercent = false;
 let hasPassedSeventyPercent = false;
 let hasPassedStartThreshold = false;
+let isTestMode = false; // Test mode flag
+
+// Character text mapping
+const characterTexts = {
+    mrbeast: "Hey everyone! Today we're looking at some incredible population growth!",
+    macron: "Mes amis, our population growth is truly exceptional!",
+    snoop: "Fo' shizzle, we're about to smoke the competition!",
+    freeman: "Let me tell you a story about population growth...",
+    trump: "Nobody grows population better than me, believe me!",
+    biden: "Here's the deal, folks - we're growing stronger!",
+    tate: "Top G never loses. Watch how we dominate!",
+    tyger: "Time to show them what real strategy looks like!",
+    omni: "The numbers don't lie - our growth is unstoppable!"
+};
+
+// Toggle test mode with Alt+T
+document.addEventListener('keydown', (e) => {
+    if (e.altKey && e.key.toLowerCase() === 't') {
+        isTestMode = !isTestMode;
+        console.log('Test mode:', isTestMode ? 'ON' : 'OFF');
+        updateDisplay(); // Update display immediately
+        
+        // Reset and restart sound interval with new timing
+        clearTimeout(soundIntervalId);
+        setupNextSoundInterval();
+    }
+});
 
 // Start sound files
 const startSoundFiles = [
-    'start/Alright, good luck out there, champ.mp3',
-    'start/Good luck looser.mp3',
-    'start/Haha, look Patrick, a grown-ass man .mp3',
-    'start/Hope your cities fall with dignity.mp3',
-    'start/I want to play a game...Live or die.mp3'
+    'start/alright_good_luck_out_there_champ.mp3',
+    'start/good_luck_looser.mp3',
+    'start/haha_look_patrick_a_grown_man.mp3',
+    'start/hope_your_cities_fall_with_dignity.mp3',
+    'start/i_want_to_play_a_game_live_or_die.mp3'
 ];
 
 // Regular sound files
 const soundFiles = [
-    'mrbeast_70% population wow, that\'s a lot !!.mp3',
-    'macronStarting tomorrow, an exceptional 69.mp3',
-    'snoop_Bro, your are about to be smoked.mp3',
-    'freeman_In the end, it\'s not the number of t.mp3',
-    'trump_I didn\'t just beat them.mp3',
-    'trump_Listen, kid—build, expand, dominate.mp3',
-    'biden_one time, I get a... A small.mp3',
-    'mrbeast_This guy has more pop than I have su.mp3',
-    'tate_While you\'re building cities, I\'m bu.mp3',
-    'tate_I left your base intact.mp3',
-    'tate_I took your capital so fast, I didn\'.mp3',
-    'tyger_Come on, son! Don\'t save troops like.mp3',
-    'You don\'t understand… this map isn\'t.mp3'
+    'mrbeast_70percent_population_wow_thats_a_lot.mp3',
+    'macron_starting_tomorrow_exceptional_69.mp3',
+    'snoop_bro_you_are_about_to_be_smoked.mp3',
+    'freeman_in_the_end_its_not_the_number.mp3',
+    'trump_i_didnt_just_beat_them.mp3',
+    'trump_listen_kid_build_expand_dominate.mp3',
+    'biden_one_time_i_get_a_small.mp3',
+    'mrbeast_this_guy_has_more_pop_than_subs.mp3',
+    'tate_while_youre_building_cities.mp3',
+    'tate_i_left_your_base_intact.mp3',
+    'tate_i_took_your_capital_so_fast.mp3',
+    'tyger_come_on_son_dont_save_troops.mp3',
+    'omni_you_dont_understand_this_map.mp3'
 ];
 
 // Function to play a random sound
@@ -45,44 +72,69 @@ function playRandomSound() {
         title = parts.slice(1).join('_');
     }
     
-    // Update display with character image if available
-    const characterImg = display.querySelector('.openfront-character-image');
-    if (characterImg) {
+    // Update character container and image
+    const characterImg = characterContainer.querySelector('.openfront-character-image');
+    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+    
+    if (characterImg && audioTitle) {
+        // Show container and update image
+        characterContainer.style.display = characterName ? 'flex' : 'none';
         characterImg.src = chrome.runtime.getURL(`img/characters/${characterName}.webp`);
         characterImg.style.display = characterName ? 'block' : 'none';
-    }
-    
-    // Update audio title
-    const audioTitle = display.querySelector('.openfront-audio-title');
-    if (audioTitle) {
-        audioTitle.textContent = title.replace('.mp3', '');
+        
+        // Get character-specific text or use default
+        const characterText = characterTexts[characterName] || title.replace('.mp3', '');
+        
+        // Create typing animation container
+        audioTitle.innerHTML = `<span class="typing-text">${characterText}</span>`;
+        
+        // Reset animation if text changes
+        const typingElement = audioTitle.querySelector('.typing-text');
+        typingElement.style.animation = 'none';
+        typingElement.offsetHeight; // Trigger reflow
+        typingElement.style.animation = null;
     }
     
     audio.play().catch(error => console.error('Error playing sound:', error));
 }
 
-// Function to set up next random interval (4-6 minutes)
+// Track sound interval ID for clearing
+let soundIntervalId;
+
+// Function to set up next random interval
 function setupNextSoundInterval() {
-    const minDelay = 2 * 60 * 1000; // 2 minutes
-    const maxDelay = 5 * 60 * 1000; // 5 minutes
-    const randomDelay = Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-    setTimeout(() => {
+    if (soundIntervalId) {
+        clearTimeout(soundIntervalId);
+    }
+    
+    const delay = isTestMode ? 10000 : // 15 seconds in test mode
+        Math.floor(Math.random() * (5 * 60 * 1000 - 2 * 60 * 1000 + 1)) + 2 * 60 * 1000; // 2-5 minutes normally
+    
+    soundIntervalId = setTimeout(() => {
         playRandomSound();
         setupNextSoundInterval(); // Set up next interval
-    }, randomDelay);
+    }, delay);
 }
 
-// Create and inject the display element
+// Create and inject display elements
 const display = document.createElement('div');
 display.className = 'openfront-population-display hidden';
 display.innerHTML = `
-    <img class="openfront-character-image" style="display: none;">
-    <div>
+    <div class="openfront-stats">
         Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
-        <span class="openfront-audio-title"></span>
     </div>
 `;
 document.body.appendChild(display);
+
+// Create and inject character container
+const characterContainer = document.createElement('div');
+characterContainer.className = 'openfront-character-container';
+characterContainer.style.display = 'none';
+characterContainer.innerHTML = `
+    <img class="openfront-character-image" style="display: none;">
+    <span class="openfront-audio-title"></span>
+`;
+document.body.appendChild(characterContainer);
 
 // Function to extract population value from the DOM
 function extractPopulation() {
@@ -132,11 +184,19 @@ function updateDisplay() {
                 const soundFile = startSoundFiles[randomStartIndex];
                 const startAudio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
                 
-                // Clear previous character image and title for start sounds
-                const characterImg = display.querySelector('.openfront-character-image');
-                const audioTitle = display.querySelector('.openfront-audio-title');
-                if (characterImg) characterImg.style.display = 'none';
-                if (audioTitle) audioTitle.textContent = soundFile.replace('start/', '').replace('.mp3', '');
+                // Hide character container and update title for start sounds
+                characterContainer.style.display = 'none';
+                const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+                if (audioTitle) {
+                    const startText = soundFile.replace('start/', '').replace('.mp3', '');
+                    audioTitle.innerHTML = `<span class="typing-text">${startText}</span>`;
+                    
+                    // Reset animation
+                    const typingElement = audioTitle.querySelector('.typing-text');
+                    typingElement.style.animation = 'none';
+                    typingElement.offsetHeight; // Trigger reflow
+                    typingElement.style.animation = null;
+                }
                 
                 startAudio.play().catch(error => console.error('Error playing start sound:', error));
             }
@@ -158,9 +218,9 @@ function updateDisplay() {
         }
     }
 
-    // Show display if we're on a game page
-    const isGamePage = window.location.pathname.includes('/join/');
-    display.classList.toggle('hidden', !isGamePage);
+    // Show display if we're on a game page or in test mode
+    const shouldShow = isTestMode || window.location.pathname.includes('/join/');
+    display.classList.toggle('hidden', !shouldShow);
 }
 
 // Set up update interval
@@ -176,6 +236,7 @@ setupNextSoundInterval();
 window.addEventListener('unload', () => {
     clearInterval(updateInterval);
     display.remove();
+    characterContainer.remove();
 });
 
 // Update when URL changes (for single-page app navigation)

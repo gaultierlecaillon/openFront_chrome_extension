@@ -3,20 +3,39 @@
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
+  color: white;
+  z-index: 9999;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.openfront-stats {
   display: flex;
   align-items: center;
   gap: 10px;
   background-color: rgba(0, 0, 0, 0.8);
-  color: white;
   padding: 8px 16px;
   border-radius: 6px;
   font-size: 16px;
   font-weight: 600;
-  z-index: 9999;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: opacity 0.3s ease;
-  pointer-events: none;
   backdrop-filter: blur(4px);
+}
+
+.openfront-character-container {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
 }
 
 .openfront-population-display.hidden {
@@ -58,4 +77,26 @@
   margin-left: 8px;
   font-style: italic;
   opacity: 0.8;
+  min-width: 200px;
+  display: inline-block;
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+.typing-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #60a5fa;
+  animation: typing 1.5s steps(40, end),
+             blink-caret 0.75s step-end infinite;
+  margin: 0;
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent }
+  50% { border-color: #60a5fa }
 }

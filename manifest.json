@@ -13,7 +13,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["mp3/*"],
+      "resources": ["mp3/*", "img/characters/*"],
       "matches": ["https://openfront.io/*"]
     }
   ]
