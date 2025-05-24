@@ -32,15 +32,19 @@ function createBeepSound(frequency = 800, duration = 500) {
 /**
  * Creates a sound for the 50% population threshold
  */
-export function createFiftyPercentSound() {
+function createFiftyPercentSound() {
     createBeepSound(800, 500); // Single beep at 800Hz
 }
 
 /**
  * Creates a sound for the 70% population threshold
  */
-export function createSeventyPercentSound() {
+function createSeventyPercentSound() {
     // Create a double beep at a higher frequency
     createBeepSound(1000, 200);
     setTimeout(() => createBeepSound(1000, 200), 250);
 }
+
+// Make functions available globally
+window.createFiftyPercentSound = createFiftyPercentSound;
+window.createSeventyPercentSound = createSeventyPercentSound;

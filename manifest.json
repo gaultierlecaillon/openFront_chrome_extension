@@ -8,8 +8,7 @@
     {
       "matches": ["https://openfront.io/*"],
       "css": ["styles.css"],
-      "js": ["alert.js", "content.js"],
-      "type": "module"
+      "js": ["audioData.js", "alert.js", "content.js"]
     }
   ],
   "web_accessible_resources": [

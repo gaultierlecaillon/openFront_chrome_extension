@@ -1,6 +1,4 @@
-// Import audio data and alert functions
-import { audioTexts, startTexts, startSoundFiles, soundFiles } from './audioData.js';
-import { createFiftyPercentSound, createSeventyPercentSound } from './alert.js';
+// Audio data and alert functions are loaded from audioData.js and alert.js
 
 // State tracking
 let hasPassedFiftyPercent = false;

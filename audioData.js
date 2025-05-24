@@ -4,7 +4,7 @@
  */
 
 // Audio file to text mapping
-export const audioTexts = {
+const audioTexts = {
     // MrBeast audio clips
     'mrbeast_70percent_population_wow_thats_a_lot.mp3': "70% population ! Wow, that's a lot...",
     'mrbeast_this_guy_has_more_pop_than_subs.mp3': "This guy has more population than I have subscribers!",
@@ -39,7 +39,7 @@ export const audioTexts = {
 };
 
 // Start sound texts
-export const startTexts = {
+const startTexts = {
     'start/Alright, good luck out there, champ.mp3': "Alright, good luck out there, champ!",
     'start/Good luck looser.mp3': "Good luck, loser!",
     'start/Hope your cities fall with dignity.mp3': "Hope your cities fall with dignity!",
@@ -47,7 +47,7 @@ export const startTexts = {
 };
 
 // Start sound files
-export const startSoundFiles = [
+const startSoundFiles = [
     'start/Alright, good luck out there, champ.mp3',
     'start/Good luck looser.mp3',
     'start/Hope your cities fall with dignity.mp3',
@@ -55,7 +55,7 @@ export const startSoundFiles = [
 ];
 
 // Regular sound files
-export const soundFiles = [
+const soundFiles = [
     'mrbeast_70percent_population_wow_thats_a_lot.mp3',
     'snoop_bro_you_are_about_to_be_smoked.mp3',
     'freeman_in_the_end_its_not_the_number.mp3',
