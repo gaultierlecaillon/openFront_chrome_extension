@@ -1,0 +1,45 @@
+.openfront-population-display {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
+
+.openfront-population-display.hidden {
+  opacity: 0;
+}
+
+.openfront-population-display .value,
+.openfront-population-display .total-value {
+  font-family: monospace;
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+.openfront-population-display .value {
+  margin-left: 4px;
+  color: #4ade80;  /* green-400 */
+}
+
+.openfront-population-display .total-value {
+  color: #fbbf24;  /* amber-400 */
+}
+
+.openfront-population-display .percent-value {
+  font-family: monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #60a5fa;  /* blue-400 */
+  margin: 0 2px;
+}

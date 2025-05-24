@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "OpenFront Population Display",
+  "version": "1.0",
+  "description": "Displays population value from OpenFront.io games",
+  "permissions": ["activeTab"],
+  "content_scripts": [
+    {
+      "matches": ["https://openfront.io/*"],
+      "css": ["styles.css"],
+      "js": ["alert.js", "content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["mp3/*"],
+      "matches": ["https://openfront.io/*"]
+    }
+  ]
+}
