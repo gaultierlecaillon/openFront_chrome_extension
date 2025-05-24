@@ -273,21 +273,6 @@ function updateDisplay() {
                     // Reset the flag if population drops below threshold
                     hasPassedStartThreshold = false;
                 }
-
-                // Play sounds when crossing 70% threshold (only once)
-                if (percentage >= 70 && !hasPassedSeventyPercent) {
-                    hasPassedSeventyPercent = true;
-                    console.log('Playing 70% threshold sound');
-                    
-                    // Play 70% population sound if available
-                    const seventyPercentSound = 'mrbeast_70percent_population_wow_thats_a_lot.mp3';
-                    if (soundFiles.includes(seventyPercentSound)) {
-                        playSpecificSound(seventyPercentSound);
-                    }
-                } else if (percentage < 70) {
-                    // Reset the flag if percentage drops below threshold
-                    hasPassedSeventyPercent = false;
-                }
                 
                 // Play sound when crossing 60% threshold (only once)
                 if (percentage >= 60 && !hasPassedSixtyPercent) {

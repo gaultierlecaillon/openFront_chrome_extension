@@ -41,7 +41,7 @@
 
 .openfront-lofi-container {
   position: fixed;
-  top: 150px; /* Position 150px from the top as requested */
+  top: 100px; /* Position 100px from the top as requested */
   right: 20px;
   display: flex !important; /* Always display the lofi button */
   align-items: center;
@@ -133,4 +133,19 @@
 @keyframes blink-caret {
   from, to { border-color: transparent }
   50% { border-color: #60a5fa }
+}
+
+/* Beat animation for lofi girl */
+@keyframes beat {
+  0%, 100% { 
+    transform: scale(1);
+  }
+  50% { 
+    transform: scale(1.15);
+  }
+}
+
+.beat-animation {
+  animation: beat 2s infinite ease-in-out;
+  transform-origin: center;
 }

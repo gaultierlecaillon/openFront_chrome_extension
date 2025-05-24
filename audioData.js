@@ -5,8 +5,8 @@
 
 // Lofi hip hop girl text states
 const lofiTexts = {
-    'playing': "Stop, I need to focus",
-    'stopped': "Brings the Chill Vibes"
+    'playing': "Stop, I need to focus 😶",
+    'stopped': "Brings the Chill Vibes 🎶"
 };
 
 // Audio file to text mapping
