@@ -93,6 +93,82 @@
         .openfront-lofi-container:hover {
             background-color: rgba(0, 0, 0, 0.9);
         }
+        
+        .openfront-voices-container {
+            position: fixed;
+            top: 160px; /* Position below the lofi container */
+            right: 20px;
+            display: flex !important;
+            align-items: center;
+            gap: 15px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .openfront-voices-container:hover {
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .openfront-voices-label {
+            color: white;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        /* Switch styles */
+        .openfront-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .openfront-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .openfront-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #555;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .openfront-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .openfront-slider {
+            background-color: #60a5fa;
+        }
+
+        input:focus + .openfront-slider {
+            box-shadow: 0 0 1px #60a5fa;
+        }
+
+        input:checked + .openfront-slider:before {
+            transform: translateX(26px);
+        }
 
         .openfront-character-image {
             width: 32px;
@@ -194,10 +270,19 @@
         <span class="openfront-audio-title"><span class="typing-text">Brings the Chill Vibes 🎶</span></span>
     </div>
     
+    <div class="openfront-voices-container" id="voicesContainer">
+        <span class="openfront-voices-label">Roast me</span>
+        <label class="openfront-switch">
+            <input type="checkbox" id="voicesToggle" checked>
+            <span class="openfront-slider"></span>
+        </label>
+    </div>
+    
     <script>
         // Test functionality
         let isLofiPlaying = false;
         let lofiAudio = null;
+        let areVoicesEnabled = true; // Default to enabled (checked)
         
         document.getElementById('lofiContainer').addEventListener('click', () => {
             if (isLofiPlaying) {
@@ -272,6 +357,104 @@
             } else {
                 characterContainer.style.display = 'none';
             }
+        });
+        
+        // Add event listener for voices toggle
+        document.getElementById('voicesToggle').addEventListener('change', (e) => {
+            areVoicesEnabled = e.target.checked;
+            console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
+            
+            // Show a notification about the current state
+            const characterContainer = document.querySelector('.openfront-character-container');
+            const characterImg = characterContainer.querySelector('.openfront-character-image');
+            const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+            
+            // Remove fade-out class if present
+            characterContainer.classList.remove('fade-out');
+            
+            // Show container with appropriate message
+            characterContainer.style.display = 'flex';
+            characterImg.src = 'img/characters/lofigirl.webp';
+            characterImg.style.display = 'block';
+            
+            const message = areVoicesEnabled 
+                ? "All character voices enabled" 
+                : "Character voices disabled (except 60% threshold)";
+            
+            audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
+            
+            // Hide container after 3 seconds
+            setTimeout(() => {
+                characterContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    characterContainer.style.display = 'none';
+                }, 500);
+            }, 3000);
+        });
+        
+        // Simulate playing a sound - this would be replaced with actual sound playing logic
+        function playSound(soundType) {
+            // Only play non-threshold sounds if voices are enabled
+            if (!areVoicesEnabled && soundType !== 'threshold') {
+                console.log('Sound not played because voices are disabled:', soundType);
+                return;
+            }
+            
+            console.log('Playing sound:', soundType);
+            
+            // Show character with message
+            const characterContainer = document.querySelector('.openfront-character-container');
+            const characterImg = characterContainer.querySelector('.openfront-character-image');
+            const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+            
+            // Remove fade-out class if present
+            characterContainer.classList.remove('fade-out');
+            
+            // Show container with appropriate message
+            characterContainer.style.display = 'flex';
+            
+            let character, message;
+            
+            if (soundType === 'threshold') {
+                character = 'mrbeast';
+                message = "60% population reached! This message always plays.";
+            } else {
+                // Random character for regular sounds
+                const characters = ['trump', 'tate', 'rick', 'snoop', 'tyson'];
+                character = characters[Math.floor(Math.random() * characters.length)];
+                message = "This is a regular character voice line";
+            }
+            
+            characterImg.src = `img/characters/${character}.webp`;
+            characterImg.style.display = 'block';
+            audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
+            
+            // Hide container after 3 seconds
+            setTimeout(() => {
+                characterContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    characterContainer.style.display = 'none';
+                }, 500);
+            }, 3000);
+        }
+        
+        // Add test buttons to demonstrate the functionality
+        const testControls = document.createElement('div');
+        testControls.className = 'controls';
+        testControls.style.marginTop = '10px';
+        testControls.innerHTML = `
+            <button id="playRegularSound">Play Regular Sound</button>
+            <button id="playThresholdSound">Play 60% Threshold Sound</button>
+        `;
+        document.querySelector('.game-container').appendChild(testControls);
+        
+        // Add event listeners for test buttons
+        document.getElementById('playRegularSound').addEventListener('click', () => {
+            playSound('regular');
+        });
+        
+        document.getElementById('playThresholdSound').addEventListener('click', () => {
+            playSound('threshold');
         });
     </script>
 </body>

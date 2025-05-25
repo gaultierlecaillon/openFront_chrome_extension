@@ -7,6 +7,7 @@ let hasPassedStartThreshold = false;
 let isExtensionEnabled = false; // Extension is disabled by default
 let isLofiPlaying = false; // Track if lofi music is playing
 let lofiAudio = null; // Reference to the lofi audio element
+let areVoicesEnabled = true; // Default to enabled
 
 // Track recently played sounds to avoid repetition
 let recentlyPlayedSounds = [];
@@ -84,6 +85,12 @@ function playSpecificSound(soundFile) {
  * Plays a random sound with improved randomization
  */
 function playRandomSound() {
+    // Only play sounds if voices are enabled
+    if (!areVoicesEnabled) {
+        console.log('Random sound not played because voices are disabled');
+        return;
+    }
+    
     // Filter out recently played sounds to avoid repetition
     const availableSounds = soundFiles.filter(sound => !recentlyPlayedSounds.includes(sound));
     
@@ -110,6 +117,12 @@ function playRandomSound() {
  * Plays a start sound
  */
 function playStartSound() {
+    // Only play start sounds if voices are enabled
+    if (!areVoicesEnabled) {
+        console.log('Start sound not played because voices are disabled');
+        return;
+    }
+    
     const randomStartIndex = Math.floor(Math.random() * startSoundFiles.length);
     const soundFile = startSoundFiles[randomStartIndex];
     const startAudio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
@@ -275,6 +288,7 @@ function updateDisplay() {
                 }
                 
                 // Play sound when crossing 60% threshold (only once)
+                // This sound plays even when voices are disabled
                 if (percentage >= 60 && !hasPassedSixtyPercent) {
                     hasPassedSixtyPercent = true;
                     console.log('Playing 60% threshold sound');
@@ -282,6 +296,28 @@ function updateDisplay() {
                     // Play the 60% sound
                     const sixtyPercentSound = new Audio(chrome.runtime.getURL('mp3/sound/60%.mp3'));
                     sixtyPercentSound.play().catch(error => console.error('Error playing 60% sound:', error));
+                    
+                    // Show a notification about reaching 60%
+                    const characterImg = characterContainer.querySelector('.openfront-character-image');
+                    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+                    
+                    // Remove fade-out class if present
+                    characterContainer.classList.remove('fade-out');
+                    
+                    // Show container with appropriate message
+                    characterContainer.style.display = 'flex';
+                    characterImg.src = chrome.runtime.getURL('img/characters/mrbeast.webp');
+                    characterImg.style.display = 'block';
+                    
+                    audioTitle.innerHTML = `<span class="typing-text">60% population reached!</span>`;
+                    
+                    // Hide container after 5 seconds
+                    setTimeout(() => {
+                        characterContainer.classList.add('fade-out');
+                        setTimeout(() => {
+                            characterContainer.style.display = 'none';
+                        }, 500);
+                    }, 5000);
                 } else if (percentage < 60) {
                     // Reset the flag if percentage drops below threshold
                     hasPassedSixtyPercent = false;
@@ -372,20 +408,97 @@ lofiContainer.innerHTML = `
 `;
 document.body.appendChild(lofiContainer);
 
-// Make sure the lofi button is always visible
-console.log('Lofi button added to page');
+// Create and inject voices toggle container
+const voicesContainer = document.createElement('div');
+voicesContainer.className = 'openfront-voices-container';
+voicesContainer.innerHTML = `
+    <span class="openfront-voices-label">Roast me</span>
+    <label class="openfront-switch">
+        <input type="checkbox" id="voicesToggle" checked>
+        <span class="openfront-slider"></span>
+    </label>
+`;
+document.body.appendChild(voicesContainer);
 
-// Ensure the lofi button is added to the page after a short delay
+// Make sure the lofi button is always visible
+console.log('Lofi button and voices toggle added to page');
+
+// Ensure the lofi button and voices toggle are added to the page after a short delay
 // This helps with pages that might load dynamically or have complex DOM structures
 setTimeout(() => {
     if (!document.body.contains(lofiContainer)) {
         console.log('Lofi button was not found, adding it again');
         document.body.appendChild(lofiContainer);
     }
+    
+    if (!document.body.contains(voicesContainer)) {
+        console.log('Voices toggle was not found, adding it again');
+        document.body.appendChild(voicesContainer);
+        
+        // Re-add the event listener
+        document.getElementById('voicesToggle').addEventListener('change', (e) => {
+            areVoicesEnabled = e.target.checked;
+            console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
+            
+            // Show notification about the current state
+            const characterImg = characterContainer.querySelector('.openfront-character-image');
+            const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+            
+            characterContainer.classList.remove('fade-out');
+            characterContainer.style.display = 'flex';
+            characterImg.src = chrome.runtime.getURL('img/characters/lofigirl.webp');
+            characterImg.style.display = 'block';
+            
+            const message = areVoicesEnabled 
+                ? "All character voices enabled" 
+                : "Character voices disabled (except 60% threshold)";
+            
+            audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
+            
+            setTimeout(() => {
+                characterContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    characterContainer.style.display = 'none';
+                }, 500);
+            }, 3000);
+        });
+    }
 }, 2000);
 
 // Add click event listener to lofi container
 lofiContainer.addEventListener('click', toggleLofiMusic);
+
+// Add change event listener to voices toggle
+document.getElementById('voicesToggle').addEventListener('change', (e) => {
+    areVoicesEnabled = e.target.checked;
+    console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
+    
+    // Show a notification about the current state
+    const characterImg = characterContainer.querySelector('.openfront-character-image');
+    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+    
+    // Remove fade-out class if present
+    characterContainer.classList.remove('fade-out');
+    
+    // Show container with appropriate message
+    characterContainer.style.display = 'flex';
+    characterImg.src = chrome.runtime.getURL('img/characters/lofigirl.webp');
+    characterImg.style.display = 'block';
+    
+    const message = areVoicesEnabled 
+        ? "All character voices enabled" 
+        : "Character voices disabled (except 60% threshold)";
+    
+    audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
+    
+    // Hide container after 3 seconds
+    setTimeout(() => {
+        characterContainer.classList.add('fade-out');
+        setTimeout(() => {
+            characterContainer.style.display = 'none';
+        }, 500);
+    }, 3000);
+});
 
 // Toggle extension enabled/disabled with Alt+T
 document.addEventListener('keydown', (e) => {
@@ -425,6 +538,7 @@ window.addEventListener('unload', () => {
     display.remove();
     characterContainer.remove();
     lofiContainer.remove();
+    voicesContainer.remove();
     
     // Remove lofi iframe if it exists
     const lofiIframe = document.getElementById('lofi-iframe');
@@ -445,6 +559,40 @@ setInterval(() => {
         if (!document.body.contains(lofiContainer)) {
             console.log('Lofi button was removed, re-adding it');
             document.body.appendChild(lofiContainer);
+        }
+        
+        // Ensure voices toggle is still in the DOM after page navigation
+        if (!document.body.contains(voicesContainer)) {
+            console.log('Voices toggle was removed, re-adding it');
+            document.body.appendChild(voicesContainer);
+            
+            // Re-add the event listener
+            document.getElementById('voicesToggle').addEventListener('change', (e) => {
+                areVoicesEnabled = e.target.checked;
+                console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
+                
+                // Show notification about the current state
+                const characterImg = characterContainer.querySelector('.openfront-character-image');
+                const audioTitle = characterContainer.querySelector('.openfront-audio-title');
+                
+                characterContainer.classList.remove('fade-out');
+                characterContainer.style.display = 'flex';
+                characterImg.src = chrome.runtime.getURL('img/characters/lofigirl.webp');
+                characterImg.style.display = 'block';
+                
+                const message = areVoicesEnabled 
+                    ? "All character voices enabled" 
+                    : "Character voices disabled (except 60% threshold)";
+                
+                audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
+                
+                setTimeout(() => {
+                    characterContainer.classList.add('fade-out');
+                    setTimeout(() => {
+                        characterContainer.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            });
         }
     }
 }, 500);

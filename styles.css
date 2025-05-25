@@ -41,12 +41,12 @@
 
 .openfront-lofi-container {
   position: fixed;
-  top: 100px; /* Position 100px from the top as requested */
-  right: 20px;
+  top: 320px; /* Position 100px from the top as requested */
+  right: 10px;
   display: flex !important; /* Always display the lofi button */
   align-items: center;
   gap: 15px;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 12px 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -58,6 +58,82 @@
 
 .openfront-lofi-container:hover {
   background-color: rgba(0, 0, 0, 0.9);
+}
+
+.openfront-voices-container {
+  position: fixed;
+  top: 405px; /* Position below the lofi container */
+  right: 20px;
+  display: flex !important;
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  transition: opacity 0.5s ease;
+}
+
+.openfront-voices-container:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.openfront-voices-label {
+  color: white;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+/* Switch styles */
+.openfront-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.openfront-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.openfront-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #555;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.openfront-slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .openfront-slider {
+  background-color: #60a5fa;
+}
+
+input:focus + .openfront-slider {
+  box-shadow: 0 0 1px #60a5fa;
+}
+
+input:checked + .openfront-slider:before {
+  transform: translateX(26px);
 }
 
 .openfront-character-container.fade-out {
