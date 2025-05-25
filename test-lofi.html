@@ -254,9 +254,9 @@
     </div>
     
     <!-- Extension Elements -->
-    <div class="openfront-population-display">
+    <div class="openfront-population-display" style="display: none;">
         <div class="openfront-stats">
-            Population: <span class="value">5.2K</span> / <span class="total-value">7.5K</span> (<span class="percent-value">69%</span>)
+            Population: <span class="value">0</span> / <span class="total-value">7.5K</span> (<span class="percent-value">0%</span>)
         </div>
     </div>
     
@@ -445,6 +445,7 @@
         testControls.innerHTML = `
             <button id="playRegularSound">Play Regular Sound</button>
             <button id="playThresholdSound">Play 60% Threshold Sound</button>
+            <button id="startGame">Start Game (Change Pop from 0)</button>
         `;
         document.querySelector('.game-container').appendChild(testControls);
         
@@ -455,6 +456,29 @@
         
         document.getElementById('playThresholdSound').addEventListener('click', () => {
             playSound('threshold');
+        });
+        
+        // Add event listener for the Start Game button
+        document.getElementById('startGame').addEventListener('click', () => {
+            const popDisplay = document.querySelector('.openfront-population-display');
+            const valueElement = popDisplay.querySelector('.value');
+            
+            // Change population from 0 to 3.1K to simulate game starting
+            valueElement.textContent = '3.1K';
+            
+            // Update percentage
+            const percentElement = popDisplay.querySelector('.percent-value');
+            const totalElement = popDisplay.querySelector('.total-value');
+            const currentNum = 3.1;
+            const totalNum = parseFloat(totalElement.textContent.replace('K', ''));
+            const percentage = Math.round((currentNum / totalNum) * 100);
+            percentElement.textContent = `${percentage}%`;
+            
+            // Show the population display
+            popDisplay.style.display = 'block';
+            
+            // Play a start sound
+            playSound('regular');
         });
     </script>
 </body>

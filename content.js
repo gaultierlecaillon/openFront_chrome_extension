@@ -4,7 +4,7 @@
 let hasPassedSixtyPercent = false;
 let hasPassedSeventyPercent = false;
 let hasPassedStartThreshold = false;
-let isExtensionEnabled = false; // Extension is disabled by default
+let isExtensionEnabled = true; // Extension is enabled by default
 let isLofiPlaying = false; // Track if lofi music is playing
 let lofiAudio = null; // Reference to the lofi audio element
 let areVoicesEnabled = true; // Default to enabled
@@ -246,20 +246,19 @@ function extractPopulation() {
  * Updates the population display
  */
 function updateDisplay() {
-    // Update display content based on extension state
-    if (!isExtensionEnabled) {
-        // When disabled, just show the disabled message
-        display.innerHTML = `
-            <div class="openfront-stats">
-                OpenFront Extension: disabled (press: ALT + T)
-            </div>
-        `;
-        display.classList.remove('hidden'); // Always show the disabled message
+    // Extract population values
+    const { current, total } = extractPopulation();
+    
+    // Don't display the population stats before the game starts (when pop is 0 or not found)
+    const currentNum = parseFloat(current.replace('K', ''));
+    if (currentNum === 0 || current === '0') {
+        display.style.display = 'none';
         return;
+    } else {
+        display.style.display = 'block';
     }
     
-    // When enabled, show the population stats
-    const { current, total } = extractPopulation();
+    // Update the population stats
     const currentElement = display.querySelector('.value');
     const totalElement = display.querySelector('.total-value');
     
@@ -298,17 +297,11 @@ function updateDisplay() {
                     sixtyPercentSound.play().catch(error => console.error('Error playing 60% sound:', error));
                     
                     // Show a notification about reaching 60%
-                    const characterImg = characterContainer.querySelector('.openfront-character-image');
                     const audioTitle = characterContainer.querySelector('.openfront-audio-title');
                     
                     // Remove fade-out class if present
                     characterContainer.classList.remove('fade-out');
-                    
-                    // Show container with appropriate message
-                    characterContainer.style.display = 'flex';
-                    characterImg.src = chrome.runtime.getURL('img/characters/mrbeast.webp');
-                    characterImg.style.display = 'block';
-                    
+            
                     audioTitle.innerHTML = `<span class="typing-text">60% population reached!</span>`;
                     
                     // Hide container after 5 seconds
@@ -326,9 +319,7 @@ function updateDisplay() {
         }
     }
 
-    // Show display if we're on a game page
-    const shouldShow = window.location.pathname.includes('/join/');
-    display.classList.toggle('hidden', !shouldShow);
+    // Always show the display, no need to toggle visibility anymore
 }
 
 /**
@@ -381,7 +372,7 @@ function toggleLofiMusic() {
 
 // Create and inject display elements
 const display = document.createElement('div');
-display.className = 'openfront-population-display hidden';
+display.className = 'openfront-population-display';
 display.innerHTML = `
     <div class="openfront-stats">
         Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
@@ -500,28 +491,7 @@ document.getElementById('voicesToggle').addEventListener('change', (e) => {
     }, 3000);
 });
 
-// Toggle extension enabled/disabled with Alt+T
-document.addEventListener('keydown', (e) => {
-    if (e.altKey && e.key.toLowerCase() === 't') {
-        isExtensionEnabled = !isExtensionEnabled;
-        console.log('OpenFront Extension:', isExtensionEnabled ? 'ENABLED' : 'DISABLED');
-        
-        // Reset display content
-        if (isExtensionEnabled) {
-            display.innerHTML = `
-                <div class="openfront-stats">
-                    Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
-                </div>
-            `;
-        }
-        
-        updateDisplay(); // Update display immediately
-        
-        // Reset and restart sound interval with new timing
-        clearTimeout(soundIntervalId);
-        setupNextSoundInterval();
-    }
-});
+// No ALT+T toggle functionality needed anymore since we have the voices switch
 
 // Set up update interval
 const updateInterval = setInterval(updateDisplay, 1000);

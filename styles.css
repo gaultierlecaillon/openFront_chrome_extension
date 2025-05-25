@@ -62,12 +62,12 @@
 
 .openfront-voices-container {
   position: fixed;
-  top: 405px; /* Position below the lofi container */
-  right: 20px;
+  top: 380px; /* Position below the lofi container */
+  right: 10px;
   display: flex !important;
   align-items: center;
   gap: 15px;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.5);
   padding: 12px 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
