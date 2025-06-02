@@ -1,220 +1,11 @@
-// Audio data and alert functions are loaded from audioData.js and alert.js
-
 // State tracking
-let hasPassedSixtyPercent = false;
-let hasPassedSeventyPercent = false;
-let hasPassedStartThreshold = false;
-let isExtensionEnabled = true; // Extension is enabled by default
 let isLofiPlaying = false; // Track if lofi music is playing
-let lofiAudio = null; // Reference to the lofi audio element
-let areVoicesEnabled = true; // Default to enabled
 
-// Track recently played sounds to avoid repetition
-let recentlyPlayedSounds = [];
-const MAX_RECENT_SOUNDS = Math.min(5, Math.floor(soundFiles.length / 2)); // Keep track of up to 5 recent sounds or half the total
-
-// Track sound interval ID for clearing
-let soundIntervalId;
-
-/**
- * Plays a specific sound file
- * @param {string} soundFile - The sound file to play
- */
-function playSpecificSound(soundFile) {
-    const audio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
-    
-    // Extract character name and title
-    const parts = soundFile.split('_');
-    let characterName = '';
-    let title = soundFile;
-    
-    if (parts.length > 1) {
-        characterName = parts[0];
-        title = parts.slice(1).join('_');
-    }
-    
-    // Update character container and image
-    const characterImg = characterContainer.querySelector('.openfront-character-image');
-    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-    
-    if (characterImg && audioTitle) {
-        // Remove fade-out class if present
-        characterContainer.classList.remove('fade-out');
-        
-        // Show container and update image
-        characterContainer.style.display = characterName ? 'flex' : 'none';
-        characterImg.src = chrome.runtime.getURL(`img/characters/${characterName}.webp`);
-        characterImg.style.display = characterName ? 'block' : 'none';
-        
-        // Get audio-specific text or use default
-        const audioText = audioTexts[soundFile] || title.replace('.mp3', '');
-        
-        // Create typing animation container
-        audioTitle.innerHTML = `<span class="typing-text">${audioText}</span>`;
-        
-        // Play audio and get duration
-        audio.addEventListener('loadedmetadata', () => {
-            // Set typing animation duration to match audio duration
-            const typingElement = audioTitle.querySelector('.typing-text');
-            if (typingElement) {
-                const audioDuration = audio.duration;
-                const typingDuration = audioDuration * 0.9; // 90% of audio duration
-                typingElement.style.animation = `typing ${typingDuration}s steps(${audioText.length * 2}, end), blink-caret 0.75s step-end infinite`;
-            }
-        });
-        
-        // Add event listener to hide container when audio ends (with 5s delay)
-        audio.addEventListener('ended', () => {
-            // Wait 5 seconds before starting fade-out
-            setTimeout(() => {
-                // Add fade-out class to smoothly hide the container
-                characterContainer.classList.add('fade-out');
-                
-                // Hide container after fade-out animation completes
-                setTimeout(() => {
-                    characterContainer.style.display = 'none';
-                }, 500); // Match the transition duration in CSS
-            }, 5000); // 5 second delay before hiding
-        });
-    }
-    
-    audio.play().catch(error => console.error('Error playing sound:', error));
-}
-
-/**
- * Plays a random sound with improved randomization
- */
-function playRandomSound() {
-    // Only play sounds if voices are enabled
-    if (!areVoicesEnabled) {
-        console.log('Random sound not played because voices are disabled');
-        return;
-    }
-    
-    // Filter out recently played sounds to avoid repetition
-    const availableSounds = soundFiles.filter(sound => !recentlyPlayedSounds.includes(sound));
-    
-    // If we've played all sounds or nearly all, reset the recently played list
-    if (availableSounds.length <= 2) {
-        recentlyPlayedSounds = [];
-    }
-    
-    // Select a random sound from available sounds
-    const randomIndex = Math.floor(Math.random() * availableSounds.length);
-    const soundFile = availableSounds[randomIndex];
-    
-    // Add to recently played list and maintain its max size
-    recentlyPlayedSounds.push(soundFile);
-    if (recentlyPlayedSounds.length > MAX_RECENT_SOUNDS) {
-        recentlyPlayedSounds.shift(); // Remove oldest sound
-    }
-    
-    playSpecificSound(soundFile);
-}
-
-
-/**
- * Plays a start sound
- */
-function playStartSound() {
-    // Only play start sounds if voices are enabled
-    if (!areVoicesEnabled) {
-        console.log('Start sound not played because voices are disabled');
-        return;
-    }
-    
-    const randomStartIndex = Math.floor(Math.random() * startSoundFiles.length);
-    const soundFile = startSoundFiles[randomStartIndex];
-    const startAudio = new Audio(chrome.runtime.getURL(`mp3/${soundFile}`));
-    
-    // Extract character name from the sound file
-    // Format is typically: start/charactername_rest_of_filename.mp3
-    const filenameWithoutPath = soundFile.replace('start/', '');
-    const parts = filenameWithoutPath.split('_');
-    let characterName = '';
-    
-    if (parts.length > 0) {
-        characterName = parts[0];
-        console.log(`Start sound character: ${characterName}`);
-    }
-    
-    // Update character container and image
-    const characterImg = characterContainer.querySelector('.openfront-character-image');
-    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-    
-    if (characterImg && audioTitle) {
-        // Remove fade-out class if present
-        characterContainer.classList.remove('fade-out');
-        
-        // Show container and update image
-        characterContainer.style.display = 'flex';
-        
-        // Set character image if we have a character name
-        if (characterName) {
-            characterImg.src = chrome.runtime.getURL(`img/characters/${characterName}.webp`);
-            characterImg.style.display = 'block';
-        } else {
-            characterImg.style.display = 'none';
-        }
-        
-        // Get the text for this sound file
-        // The keys in startTexts match the file paths in startSoundFiles
-        const startText = startTexts[soundFile] || filenameWithoutPath.replace('.mp3', '');
-        audioTitle.innerHTML = `<span class="typing-text">${startText}</span>`;
-        
-        // Set typing animation duration to match audio duration
-        startAudio.addEventListener('loadedmetadata', () => {
-            const typingElement = audioTitle.querySelector('.typing-text');
-            if (typingElement) {
-                const audioDuration = startAudio.duration;
-                const typingDuration = audioDuration * 0.9; // 90% of audio duration
-                typingElement.style.animation = `typing ${typingDuration}s steps(${startText.length * 2}, end), blink-caret 0.75s step-end infinite`;
-            }
-        });
-        
-        // Add event listener to hide container when audio ends (with 3s delay)
-        startAudio.addEventListener('ended', () => {
-            // Wait 3 seconds before starting fade-out
-            setTimeout(() => {
-                // Add fade-out class to smoothly hide the container
-                characterContainer.classList.add('fade-out');
-                
-                // Hide container after fade-out animation completes
-                setTimeout(() => {
-                    characterContainer.style.display = 'none';
-                }, 500); // Match the transition duration in CSS
-            }, 3000); // 3 second delay before hiding
-        });
-    }
-    
-    startAudio.play().catch(error => console.error('Error playing start sound:', error));
-}
-
-/**
- * Sets up the next random interval for sound playback
- */
-function setupNextSoundInterval() {
-    // Always clear any existing interval first
-    if (soundIntervalId) {
-        clearTimeout(soundIntervalId);
-        soundIntervalId = null;
-    }
-    
-    // Only set up a new interval if extension is enabled
-    if (isExtensionEnabled) {
-        // Random interval between min_interval and max_interval
-        const min_interval = 60 * 1000; // 1 minute
-        const max_interval = 2 * 60 * 1000; // 2 minutes
-        const delay = Math.floor(Math.random() * (max_interval - min_interval + 1)) + min_interval;
-        
-        console.log(`Setting up next sound interval in ${Math.round(delay/1000)} seconds`);
-        
-        soundIntervalId = setTimeout(() => {
-            playRandomSound();
-            setupNextSoundInterval(); // Set up next interval
-        }, delay);
-    }
-}
+// Lofi hip hop girl text states
+const lofiTexts = {
+    'playing': "Stop, I need to focus 😶",
+    'stopped': "Brings the Chill Vibes 🎶"
+};
 
 /**
  * Extracts population values from the DOM
@@ -273,53 +64,8 @@ function updateDisplay() {
             const totalNum = parseFloat(total.replace('K', ''));
             const percentage = totalNum > 0 ? Math.round((currentNum / totalNum) * 100) : 0;
             percentElement.textContent = `${percentage}%`;
-
-            // Only play sounds if extension is enabled
-            if (isExtensionEnabled) {
-                // Play start sound when crossing 2.5K (only once)
-                if (currentNum >= 2.5 && !hasPassedStartThreshold) {
-                    hasPassedStartThreshold = true;
-                    console.log('Playing start sound (2.5K threshold)');
-                    playStartSound();
-                } else if (currentNum < 2.5) {
-                    // Reset the flag if population drops below threshold
-                    hasPassedStartThreshold = false;
-                }
-                
-                // Play sound when crossing 60% threshold (only once)
-                // This sound plays even when voices are disabled
-                if (percentage >= 60 && !hasPassedSixtyPercent) {
-                    hasPassedSixtyPercent = true;
-                    console.log('Playing 60% threshold sound');
-                    
-                    // Play the 60% sound
-                    const sixtyPercentSound = new Audio(chrome.runtime.getURL('mp3/sound/60%.mp3'));
-                    sixtyPercentSound.play().catch(error => console.error('Error playing 60% sound:', error));
-                    
-                    // Show a notification about reaching 60%
-                    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-                    
-                    // Remove fade-out class if present
-                    characterContainer.classList.remove('fade-out');
-            
-                    audioTitle.innerHTML = `<span class="typing-text">60% population reached!</span>`;
-                    
-                    // Hide container after 5 seconds
-                    setTimeout(() => {
-                        characterContainer.classList.add('fade-out');
-                        setTimeout(() => {
-                            characterContainer.style.display = 'none';
-                        }, 500);
-                    }, 5000);
-                } else if (percentage < 60) {
-                    // Reset the flag if percentage drops below threshold
-                    hasPassedSixtyPercent = false;
-                }
-            }
         }
     }
-
-    // Always show the display, no need to toggle visibility anymore
 }
 
 /**
@@ -380,17 +126,7 @@ display.innerHTML = `
 `;
 document.body.appendChild(display);
 
-// Create and inject character container
-const characterContainer = document.createElement('div');
-characterContainer.className = 'openfront-character-container';
-characterContainer.style.display = 'none';
-characterContainer.innerHTML = `
-    <img class="openfront-character-image" style="display: none;">
-    <span class="openfront-audio-title"></span>
-`;
-document.body.appendChild(characterContainer);
-
-// Create and inject lofi button container - always visible regardless of extension state
+// Create and inject lofi button container
 const lofiContainer = document.createElement('div');
 lofiContainer.className = 'openfront-lofi-container';
 lofiContainer.innerHTML = `
@@ -399,99 +135,16 @@ lofiContainer.innerHTML = `
 `;
 document.body.appendChild(lofiContainer);
 
-// Create and inject voices toggle container
-const voicesContainer = document.createElement('div');
-voicesContainer.className = 'openfront-voices-container';
-voicesContainer.innerHTML = `
-    <span class="openfront-voices-label">Roast me</span>
-    <label class="openfront-switch">
-        <input type="checkbox" id="voicesToggle" checked>
-        <span class="openfront-slider"></span>
-    </label>
-`;
-document.body.appendChild(voicesContainer);
+// Add click event listener to lofi container
+lofiContainer.addEventListener('click', toggleLofiMusic);
 
-// Make sure the lofi button is always visible
-console.log('Lofi button and voices toggle added to page');
-
-// Ensure the lofi button and voices toggle are added to the page after a short delay
-// This helps with pages that might load dynamically or have complex DOM structures
+// Ensure the lofi button is added to the page after a short delay
 setTimeout(() => {
     if (!document.body.contains(lofiContainer)) {
         console.log('Lofi button was not found, adding it again');
         document.body.appendChild(lofiContainer);
     }
-    
-    if (!document.body.contains(voicesContainer)) {
-        console.log('Voices toggle was not found, adding it again');
-        document.body.appendChild(voicesContainer);
-        
-        // Re-add the event listener
-        document.getElementById('voicesToggle').addEventListener('change', (e) => {
-            areVoicesEnabled = e.target.checked;
-            console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
-            
-            // Show notification about the current state
-            const characterImg = characterContainer.querySelector('.openfront-character-image');
-            const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-            
-            characterContainer.classList.remove('fade-out');
-            characterContainer.style.display = 'flex';
-            characterImg.src = chrome.runtime.getURL('img/characters/lofigirl.webp');
-            characterImg.style.display = 'block';
-            
-            const message = areVoicesEnabled 
-                ? "All character voices enabled" 
-                : "Character voices disabled (except 60% threshold)";
-            
-            audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
-            
-            setTimeout(() => {
-                characterContainer.classList.add('fade-out');
-                setTimeout(() => {
-                    characterContainer.style.display = 'none';
-                }, 500);
-            }, 3000);
-        });
-    }
 }, 2000);
-
-// Add click event listener to lofi container
-lofiContainer.addEventListener('click', toggleLofiMusic);
-
-// Add change event listener to voices toggle
-document.getElementById('voicesToggle').addEventListener('change', (e) => {
-    areVoicesEnabled = e.target.checked;
-    console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
-    
-    // Show a notification about the current state
-    const characterImg = characterContainer.querySelector('.openfront-character-image');
-    const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-    
-    // Remove fade-out class if present
-    characterContainer.classList.remove('fade-out');
-    
-    // Show container with appropriate message
-    characterContainer.style.display = 'flex';
-    characterImg.src = chrome.runtime.getURL('img/characters/lofigirl.webp');
-    characterImg.style.display = 'block';
-    
-    const message = areVoicesEnabled 
-        ? "All character voices enabled" 
-        : "Character voices disabled (except 60% threshold)";
-    
-    audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
-    
-    // Hide container after 3 seconds
-    setTimeout(() => {
-        characterContainer.classList.add('fade-out');
-        setTimeout(() => {
-            characterContainer.style.display = 'none';
-        }, 500);
-    }, 3000);
-});
-
-// No ALT+T toggle functionality needed anymore since we have the voices switch
 
 // Set up update interval
 const updateInterval = setInterval(updateDisplay, 1000);
@@ -499,16 +152,11 @@ const updateInterval = setInterval(updateDisplay, 1000);
 // Initial update
 updateDisplay();
 
-// Start random sound playback
-setupNextSoundInterval();
-
 // Clean up on page unload
 window.addEventListener('unload', () => {
     clearInterval(updateInterval);
     display.remove();
-    characterContainer.remove();
     lofiContainer.remove();
-    voicesContainer.remove();
     
     // Remove lofi iframe if it exists
     const lofiIframe = document.getElementById('lofi-iframe');
@@ -529,40 +177,6 @@ setInterval(() => {
         if (!document.body.contains(lofiContainer)) {
             console.log('Lofi button was removed, re-adding it');
             document.body.appendChild(lofiContainer);
-        }
-        
-        // Ensure voices toggle is still in the DOM after page navigation
-        if (!document.body.contains(voicesContainer)) {
-            console.log('Voices toggle was removed, re-adding it');
-            document.body.appendChild(voicesContainer);
-            
-            // Re-add the event listener
-            document.getElementById('voicesToggle').addEventListener('change', (e) => {
-                areVoicesEnabled = e.target.checked;
-                console.log('Voices are now', areVoicesEnabled ? 'enabled' : 'disabled');
-                
-                // Show notification about the current state
-                const characterImg = characterContainer.querySelector('.openfront-character-image');
-                const audioTitle = characterContainer.querySelector('.openfront-audio-title');
-                
-                characterContainer.classList.remove('fade-out');
-                characterContainer.style.display = 'flex';
-                characterImg.src = chrome.runtime.getURL('img/characters/lofigirl.webp');
-                characterImg.style.display = 'block';
-                
-                const message = areVoicesEnabled 
-                    ? "All character voices enabled" 
-                    : "Character voices disabled (except 60% threshold)";
-                
-                audioTitle.innerHTML = `<span class="typing-text">${message}</span>`;
-                
-                setTimeout(() => {
-                    characterContainer.classList.add('fade-out');
-                    setTimeout(() => {
-                        characterContainer.style.display = 'none';
-                    }, 500);
-                }, 3000);
-            });
         }
     }
 }, 500);

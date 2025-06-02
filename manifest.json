@@ -8,12 +8,12 @@
     {
       "matches": ["https://openfront.io/*"],
       "css": ["styles.css"],
-      "js": ["audioData.js", "alert.js", "content.js"]
+      "js": ["content.js"]
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["mp3/*", "img/characters/*"],
+      "resources": ["img/characters/lofigirl.webp"],
       "matches": ["https://openfront.io/*"]
     }
   ]

@@ -1,6 +1,6 @@
 # 🎮 OpenFront Chrome Extension
 
-Enhance your OpenFront.io gaming experience with population tracking and audio feedback! 🚀
+Enhance your OpenFront.io gaming experience with population tracking and lofi music! 🚀
 
 ## ✨ Features
 
@@ -9,10 +9,10 @@ Enhance your OpenFront.io gaming experience with population tracking and audio f
   - Large percentage display for quick reference
   - Color-coded values for better readability
 
-- **Sound Alerts** 🔊
-  - 50% population: Single beep alert
-  - 70% population: Double beep alert
-  - Random motivational voice lines every 4-6 minutes 🎯
+- **Lofi Music Player** 🎵
+  - Click the lofi girl button to start/stop chill background music
+  - Perfect for maintaining focus during long gaming sessions
+  - Unobtrusive YouTube embed that plays in the background
 
 ## 🚀 Installation
 
@@ -30,7 +30,15 @@ The extension automatically activates when you join a game. The population displ
 - 🟡 Amber: Maximum population
 - 🔵 Blue: Percentage (enlarged for visibility)
 
-Sound alerts will play automatically when reaching population thresholds and random intervals.
+Click the lofi girl button on the right side of the screen to toggle background music on/off.
+
+## 🧹 Recent Changes
+
+This extension has been cleaned up to focus on core functionality:
+- Removed all voice character audio and related logic
+- Removed character images (except lofi girl)
+- Simplified codebase for better performance
+- Kept only population stats and lofi music features
 
 ## License
 
