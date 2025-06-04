@@ -8,6 +8,26 @@ const lofiTexts = {
 };
 
 /**
+ * Converts population string to numeric value
+ * @param {string} popString - Population string like "53.2K" or "1.3M"
+ * @returns {number} Numeric value
+ */
+function parsePopulation(popString) {
+    if (!popString || popString === '0') return 0;
+    
+    const numStr = popString.replace(/[KM]/g, '');
+    const num = parseFloat(numStr);
+    
+    if (popString.includes('M')) {
+        return num * 1000000;
+    } else if (popString.includes('K')) {
+        return num * 1000;
+    }
+    
+    return num;
+}
+
+/**
  * Extracts population values from the DOM
  * @returns {Object} Object containing current and total population values
  */
@@ -25,7 +45,7 @@ function extractPopulation() {
 
         // Extract both current and total population values
         const text = popElement.querySelector('span[translate="no"]')?.textContent || '';
-        const values = text.match(/(\d+\.?\d*K?)\s*\/\s*(\d+\.?\d*K?)/);
+        const values = text.match(/(\d+\.?\d*[KM]?)\s*\/\s*(\d+\.?\d*[KM]?)/);
         return values ? { current: values[1], total: values[2] } : { current: '0', total: '0' };
     } catch (error) {
         console.error('Error extracting population:', error);
@@ -41,7 +61,7 @@ function updateDisplay() {
     const { current, total } = extractPopulation();
     
     // Don't display the population stats before the game starts (when pop is 0 or not found)
-    const currentNum = parseFloat(current.replace('K', ''));
+    const currentNum = parsePopulation(current);
     if (currentNum === 0 || current === '0') {
         display.style.display = 'none';
         return;
@@ -60,8 +80,8 @@ function updateDisplay() {
         // Calculate and update percentage
         const percentElement = display.querySelector('.percent-value');
         if (percentElement) {
-            const currentNum = parseFloat(current.replace('K', ''));
-            const totalNum = parseFloat(total.replace('K', ''));
+            const currentNum = parsePopulation(current);
+            const totalNum = parsePopulation(total);
             const percentage = totalNum > 0 ? Math.round((currentNum / totalNum) * 100) : 0;
             percentElement.textContent = `${percentage}%`;
         }
