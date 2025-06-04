@@ -10,6 +10,15 @@ Enhance your OpenFront.io gaming experience with population tracking and lofi mu
   - Shows current/total population at the top of the screen
   - Large percentage display for quick reference
   - Color-coded values for better readability
+- **Why Track Population?** 🎯
+  - **Optimal Attack Timing**: To maximize your population growth, you should attack when you're around 60-70% of your maximum population capacity
+  - **Strategic Advantage**: Real-time percentage display helps you identify the perfect moment to launch attacks for maximum efficiency
+  - **Resource Management**: Avoid attacking too early (wasted potential) or too late (missed opportunities)
+  - **Visual Learning**: The growth curve below shows the mathematical relationship between current population and optimal attack timing
+  
+  ![Population Growth Curve](img/screenshots/groth_curve.png)
+  
+  *The sweet spot for attacks is in the highlighted zone where population growth rate is optimized*
 
 - **Lofi Music Player** 🎵
   - Click the lofi girl button to start/stop chill background music
@@ -39,4 +48,4 @@ Click the lofi girl button on the right side of the screen to toggle background 
 
 MIT License - Feel free to modify and share!
 
-Vibe Coded with love for the OpenFront community! 💖 
+Vibe Coded with love for the OpenFront community! 💖
