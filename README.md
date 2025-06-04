@@ -34,14 +34,9 @@ The extension automatically activates when you join a game. The population displ
 
 Click the lofi girl button on the right side of the screen to toggle background music on/off.
 
-## 🧹 Recent Changes
-
-This extension has been cleaned up to focus on core functionality:
-- Removed all voice character audio and related logic
-- Removed character images (except lofi girl)
-- Simplified codebase for better performance
-- Kept only population stats and lofi music features
 
 ## License
 
 MIT License - Feel free to modify and share!
+
+Vibe Coded with love for the OpenFront community! 💖 
