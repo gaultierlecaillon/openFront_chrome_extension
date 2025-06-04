@@ -2,6 +2,8 @@
 
 Enhance your OpenFront.io gaming experience with population tracking and lofi music! 🚀
 
+![Extension Demo](img/screenshots/demo.png)
+
 ## ✨ Features
 
 - **Population Display** 📊
