@@ -43,6 +43,48 @@
   background-color: rgba(0, 0, 0, 0.9);
 }
 
+.openfront-phonk-container {
+  position: fixed;
+  top: 380px;
+  right: 10px;
+  display: flex !important;
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  transition: opacity 0.5s ease;
+  cursor: pointer;
+}
+
+.openfront-phonk-container:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+.openfront-reggaedub-container {
+  position: fixed;
+  top: 440px;
+  right: 10px;
+  display: flex !important;
+  align-items: center;
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  transition: opacity 0.5s ease;
+  cursor: pointer;
+}
+
+.openfront-reggaedub-container:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
 .openfront-population-display .value,
 .openfront-population-display .total-value {
   font-family: monospace;

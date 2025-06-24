@@ -13,7 +13,11 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["img/characters/lofigirl.webp"],
+      "resources": [
+        "img/characters/lofigirl.webp",
+        "img/characters/phonk_radio.jpg",
+        "img/characters/reggaeDub.png"
+      ],
       "matches": ["https://openfront.io/*"]
     }
   ]

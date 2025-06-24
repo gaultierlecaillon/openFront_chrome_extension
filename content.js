@@ -1,10 +1,24 @@
 // State tracking
 let isLofiPlaying = false; // Track if lofi music is playing
+let isPhonkPlaying = false; // Track if phonk music is playing
+let isReggaeDubPlaying = false; // Track if reggae dub music is playing
 
 // Lofi hip hop girl text states
 const lofiTexts = {
-    'playing': "Stop, I need to focus 😶",
-    'stopped': "Brings the Chill Vibes 🎶"
+    'playing': "Turn off Lofi Radio 🤫",
+    'stopped': "Lofi Radio 🎶"
+};
+
+// Phonk radio text states
+const phonkTexts = {
+    'playing': "Turn off Phunk Radio 🤫",
+    'stopped': "Phunk Radio 🔥"
+};
+
+// Reggae dub radio text states
+const reggaeDubTexts = {
+    'playing': "Turn off Reggae Radio 🤫",
+    'stopped': "Reggae Radio 🌴"
 };
 
 /**
@@ -136,6 +150,102 @@ function toggleLofiMusic() {
     }
 }
 
+/**
+ * Toggles the phonk music
+ */
+function togglePhonkMusic() {
+    if (isPhonkPlaying) {
+        // Stop the music by removing the iframe
+        const existingIframe = document.getElementById('phonk-iframe');
+        if (existingIframe) {
+            existingIframe.remove();
+        }
+        
+        isPhonkPlaying = false;
+        
+        // Update button text
+        const phonkText = phonkContainer.querySelector('.openfront-audio-title');
+        if (phonkText) {
+            phonkText.innerHTML = `<span class="typing-text">${phonkTexts.stopped}</span>`;
+        }
+    } else {
+        // Create and add the YouTube iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'phonk-iframe';
+        iframe.width = '0';  // Hidden but still playing audio
+        iframe.height = '0';
+        iframe.style.position = 'absolute';
+        iframe.style.bottom = '0';
+        iframe.style.right = '0';
+        iframe.style.opacity = '0.01';  // Nearly invisible but still functional
+        iframe.style.pointerEvents = 'none';  // Prevent interaction
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.src = 'https://www.youtube.com/embed/suYOayE3e00?si=f9BYuflsdIs9uFJK&autoplay=1&mute=0';
+        iframe.title = 'Phonk Radio';
+        iframe.frameBorder = '0';
+        
+        document.body.appendChild(iframe);
+        
+        isPhonkPlaying = true;
+        
+        // Update button text
+        const phonkText = phonkContainer.querySelector('.openfront-audio-title');
+        if (phonkText) {
+            phonkText.innerHTML = `<span class="typing-text">${phonkTexts.playing}</span>`;
+        }
+        
+        console.log('Phonk music started with YouTube embed');
+    }
+}
+
+/**
+ * Toggles the reggae dub music
+ */
+function toggleReggaeDubMusic() {
+    if (isReggaeDubPlaying) {
+        // Stop the music by removing the iframe
+        const existingIframe = document.getElementById('reggaedub-iframe');
+        if (existingIframe) {
+            existingIframe.remove();
+        }
+        
+        isReggaeDubPlaying = false;
+        
+        // Update button text
+        const reggaeDubText = reggaeDubContainer.querySelector('.openfront-audio-title');
+        if (reggaeDubText) {
+            reggaeDubText.innerHTML = `<span class="typing-text">${reggaeDubTexts.stopped}</span>`;
+        }
+    } else {
+        // Create and add the YouTube iframe
+        const iframe = document.createElement('iframe');
+        iframe.id = 'reggaedub-iframe';
+        iframe.width = '0';  // Hidden but still playing audio
+        iframe.height = '0';
+        iframe.style.position = 'absolute';
+        iframe.style.bottom = '0';
+        iframe.style.right = '0';
+        iframe.style.opacity = '0.01';  // Nearly invisible but still functional
+        iframe.style.pointerEvents = 'none';  // Prevent interaction
+        iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+        iframe.src = 'https://www.youtube.com/embed/f8loSOHbdGs?si=Kau7c_0uBCasW9CD&autoplay=1&mute=0';
+        iframe.title = 'Reggae Dub Radio';
+        iframe.frameBorder = '0';
+        
+        document.body.appendChild(iframe);
+        
+        isReggaeDubPlaying = true;
+        
+        // Update button text
+        const reggaeDubText = reggaeDubContainer.querySelector('.openfront-audio-title');
+        if (reggaeDubText) {
+            reggaeDubText.innerHTML = `<span class="typing-text">${reggaeDubTexts.playing}</span>`;
+        }
+        
+        console.log('Reggae Dub music started with YouTube embed');
+    }
+}
+
 // Create and inject display elements
 const display = document.createElement('div');
 display.className = 'openfront-population-display';
@@ -158,11 +268,43 @@ document.body.appendChild(lofiContainer);
 // Add click event listener to lofi container
 lofiContainer.addEventListener('click', toggleLofiMusic);
 
-// Ensure the lofi button is added to the page after a short delay
+// Create and inject phonk button container
+const phonkContainer = document.createElement('div');
+phonkContainer.className = 'openfront-phonk-container';
+phonkContainer.innerHTML = `
+    <img class="openfront-character-image" src="${chrome.runtime.getURL('img/characters/phonk_radio.jpg')}">
+    <span class="openfront-audio-title"><span class="typing-text">${phonkTexts.stopped}</span></span>
+`;
+document.body.appendChild(phonkContainer);
+
+// Add click event listener to phonk container
+phonkContainer.addEventListener('click', togglePhonkMusic);
+
+// Create and inject reggae dub button container
+const reggaeDubContainer = document.createElement('div');
+reggaeDubContainer.className = 'openfront-reggaedub-container';
+reggaeDubContainer.innerHTML = `
+    <img class="openfront-character-image" src="${chrome.runtime.getURL('img/characters/reggaeDub.png')}">
+    <span class="openfront-audio-title"><span class="typing-text">${reggaeDubTexts.stopped}</span></span>
+`;
+document.body.appendChild(reggaeDubContainer);
+
+// Add click event listener to reggae dub container
+reggaeDubContainer.addEventListener('click', toggleReggaeDubMusic);
+
+// Ensure the buttons are added to the page after a short delay
 setTimeout(() => {
     if (!document.body.contains(lofiContainer)) {
         console.log('Lofi button was not found, adding it again');
         document.body.appendChild(lofiContainer);
+    }
+    if (!document.body.contains(phonkContainer)) {
+        console.log('Phonk button was not found, adding it again');
+        document.body.appendChild(phonkContainer);
+    }
+    if (!document.body.contains(reggaeDubContainer)) {
+        console.log('Reggae Dub button was not found, adding it again');
+        document.body.appendChild(reggaeDubContainer);
     }
 }, 2000);
 
@@ -177,11 +319,21 @@ window.addEventListener('unload', () => {
     clearInterval(updateInterval);
     display.remove();
     lofiContainer.remove();
+    phonkContainer.remove();
+    reggaeDubContainer.remove();
     
-    // Remove lofi iframe if it exists
+    // Remove iframes if they exist
     const lofiIframe = document.getElementById('lofi-iframe');
     if (lofiIframe) {
         lofiIframe.remove();
+    }
+    const phonkIframe = document.getElementById('phonk-iframe');
+    if (phonkIframe) {
+        phonkIframe.remove();
+    }
+    const reggaeDubIframe = document.getElementById('reggaedub-iframe');
+    if (reggaeDubIframe) {
+        reggaeDubIframe.remove();
     }
 });
 
@@ -193,10 +345,18 @@ setInterval(() => {
         lastPath = currentPath;
         updateDisplay();
         
-        // Ensure lofi button is still in the DOM after page navigation
+        // Ensure buttons are still in the DOM after page navigation
         if (!document.body.contains(lofiContainer)) {
             console.log('Lofi button was removed, re-adding it');
             document.body.appendChild(lofiContainer);
+        }
+        if (!document.body.contains(phonkContainer)) {
+            console.log('Phonk button was removed, re-adding it');
+            document.body.appendChild(phonkContainer);
+        }
+        if (!document.body.contains(reggaeDubContainer)) {
+            console.log('Reggae Dub button was removed, re-adding it');
+            document.body.appendChild(reggaeDubContainer);
         }
     }
 }, 500);
