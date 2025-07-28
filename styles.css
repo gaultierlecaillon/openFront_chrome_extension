@@ -22,7 +22,7 @@
   backdrop-filter: blur(4px);
 }
 
-.openfront-lofi-container {
+.openfront-lofi-radio-container {
   position: fixed;
   top: 320px;
   right: 10px;
@@ -39,11 +39,11 @@
   cursor: pointer;
 }
 
-.openfront-lofi-container:hover {
+.openfront-lofi-radio-container:hover {
   background-color: rgba(0, 0, 0, 0.9);
 }
 
-.openfront-phonk-container {
+.openfront-phunk-radio-container {
   position: fixed;
   top: 380px;
   right: 10px;
@@ -60,11 +60,11 @@
   cursor: pointer;
 }
 
-.openfront-phonk-container:hover {
+.openfront-phunk-radio-container:hover {
   background-color: rgba(0, 0, 0, 0.9);
 }
 
-.openfront-reggaedub-container {
+.openfront-reggae-radio-container {
   position: fixed;
   top: 440px;
   right: 10px;
@@ -81,7 +81,7 @@
   cursor: pointer;
 }
 
-.openfront-reggaedub-container:hover {
+.openfront-reggae-radio-container:hover {
   background-color: rgba(0, 0, 0, 0.9);
 }
 

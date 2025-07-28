@@ -1,0 +1,19 @@
+{
+  "radios": [
+    {
+      "name": "Lofi Radio",
+      "character": "lofigirl.webp",
+      "youtubeUrl": "https://www.youtube.com/embed/jfKfPfyJRdk?si=OmegLvyuJMmQg_EK&autoplay=1&mute=0"
+    },
+    {
+      "name": "Phunk Radio",
+      "character": "phonk_radio.jpg",
+      "youtubeUrl": "https://www.youtube.com/embed/suYOayE3e00?si=f9BYuflsdIs9uFJK&autoplay=1&mute=0"
+    },
+    {
+      "name": "Reggae Radio",
+      "character": "reggaeDub.png",
+      "youtubeUrl": "https://www.youtube.com/embed/X-WiQ0Rf_X0?si=fokj9iHohxybYwEk&autoplay=1&mute=0"
+    }
+  ]
+}

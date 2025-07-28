@@ -16,7 +16,8 @@
       "resources": [
         "img/characters/lofigirl.webp",
         "img/characters/phonk_radio.jpg",
-        "img/characters/reggaeDub.png"
+        "img/characters/reggaeDub.png",
+        "radio-config.json"
       ],
       "matches": ["https://openfront.io/*"]
     }
