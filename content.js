@@ -64,20 +64,42 @@ function parsePopulation(popString) {
  */
 function extractPopulation() {
     try {
-        // Find the container with population info
-        const container = document.querySelector('.bg-black\\/30.text-white');
-        if (!container) return { current: '0', total: '0' };
-
-        // Find the population value
-        const popElement = Array.from(container.querySelectorAll('div')).find(
-            div => div.textContent.includes('Pop:')
-        );
-        if (!popElement) return { current: '0', total: '0' };
-
-        // Extract both current and total population values
-        const text = popElement.querySelector('span[translate="no"]')?.textContent || '';
-        const values = text.match(/(\d+\.?\d*[KM]?)\s*\/\s*(\d+\.?\d*[KM]?)/);
-        return values ? { current: values[1], total: values[2] } : { current: '0', total: '0' };
+        // Find the container with troop info using the working method
+        const container = document.querySelector('.block.bg-black\\/30.text-white');
+        if (!container) {
+            //console.log('Could not find troops container');
+            return { current: '0', total: '0' };
+        }
+        
+        //console.log('Found container using .block.bg-black\\/30.text-white');
+        
+        // Find the element containing troop values using the working method
+        let troopText = '';
+        
+        // Find a span with translate="no" attribute that contains a slash
+        const translateSpans = container.querySelectorAll('span[translate="no"]');
+        for (const span of translateSpans) {
+            if (span.textContent && span.textContent.includes('/')) {
+                troopText = span.textContent;
+                //console.log('Found troop text using span[translate="no"] with / character');
+                break;
+            }
+        }
+        
+        if (!troopText) {
+            //console.log('Could not find troop values text');
+            return { current: '0', total: '0' };
+        }
+        
+        // Extract the values using regex
+        const values = troopText.match(/(\d+\.?\d*[KM]?)\s*\/\s*(\d+\.?\d*[KM]?)/);
+        if (values) {
+            //console.log('Found troop values:', values[1], values[2]);
+            return { current: values[1], total: values[2] };
+        } else {
+            //console.log('Could not parse troop values from text:', troopText);
+            return { current: '0', total: '0' };
+        }
     } catch (error) {
         console.error('Error extracting population:', error);
         return { current: '0', total: '0' };
@@ -258,7 +280,7 @@ async function initialize() {
     display.className = 'openfront-population-display';
     display.innerHTML = `
         <div class="openfront-stats">
-            Population: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
+            Troupes: <span class="value">0</span> / <span class="total-value">0</span> (<span class="percent-value">0%</span>)
         </div>
     `;
     document.body.appendChild(display);
