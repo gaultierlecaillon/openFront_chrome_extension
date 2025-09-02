@@ -22,67 +22,28 @@
   backdrop-filter: blur(4px);
 }
 
-.openfront-lofi-radio-container {
+.openfront-radio-container {
   position: fixed;
-  top: 420px;
-  right: 10px;
+  top: 10px;
+  right: 170px;
+  margin-top: 10px;
   display: flex !important;
   align-items: center;
-  gap: 15px;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
+  gap: 10px;
   z-index: 10000;
-  transition: opacity 0.5s ease;
-  cursor: pointer;
 }
 
-.openfront-lofi-radio-container:hover {
-  background-color: rgba(0, 0, 0, 0.9);
-}
-
-.openfront-phunk-radio-container {
-  position: fixed;
-  top: 480px;
-  right: 10px;
-  display: flex !important;
-  align-items: center;
-  gap: 15px;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  z-index: 10000;
-  transition: opacity 0.5s ease;
-  cursor: pointer;
-}
-
-.openfront-phunk-radio-container:hover {
-  background-color: rgba(0, 0, 0, 0.9);
-}
-
+.openfront-lofi-radio-container,
+.openfront-phunk-radio-container,
 .openfront-reggae-radio-container {
-  position: fixed;
-  top: 540px;
-  right: 10px;
-  display: flex !important;
-  align-items: center;
-  gap: 15px;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(4px);
-  z-index: 10000;
-  transition: opacity 0.5s ease;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
+.openfront-lofi-radio-container:hover,
+.openfront-phunk-radio-container:hover,
 .openfront-reggae-radio-container:hover {
-  background-color: rgba(0, 0, 0, 0.9);
+  transform: scale(1.1);
 }
 
 .openfront-population-display .value,
@@ -110,19 +71,20 @@
 }
 
 .openfront-character-image {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.openfront-character-image.active {
+  border-color: #60a5fa;
 }
 
 .openfront-audio-title {
-  margin-left: 8px;
-  font-style: italic;
-  min-width: 200px;
-  display: inline-block;
-  color: white;
-  font-weight: bold;
+  display: none;
 }
 
 @keyframes typing {

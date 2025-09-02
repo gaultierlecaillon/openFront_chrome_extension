@@ -142,6 +142,32 @@ function updateDisplay() {
 }
 
 /**
+ * Stop all active radios
+ */
+function stopAllRadios() {
+    if (!radioConfig) return;
+    
+    radioConfig.radios.forEach(radio => {
+        if (radioStates[radio.id]) {
+            // Stop the music by removing the iframe
+            const iframeId = `${radio.id}-iframe`;
+            const existingIframe = document.getElementById(iframeId);
+            if (existingIframe) {
+                existingIframe.remove();
+            }
+            
+            radioStates[radio.id] = false;
+            
+            // Update visual state
+            const img = document.querySelector(`.${radio.containerClass} .openfront-character-image`);
+            if (img) {
+                img.classList.remove('active');
+            }
+        }
+    });
+}
+
+/**
  * Generic function to toggle radio music
  * @param {Object} radioConfig - Radio configuration object
  */
@@ -158,13 +184,15 @@ function toggleRadioMusic(radioConfig) {
         
         radioStates[radioConfig.id] = false;
         
-        // Update button text
-        const container = document.querySelector(`.${radioConfig.containerClass}`);
-        const titleElement = container?.querySelector('.openfront-audio-title');
-        if (titleElement) {
-            titleElement.innerHTML = `<span class="typing-text">${radioConfig.texts.stopped}</span>`;
+        // Update visual state
+        const img = document.querySelector(`.${radioConfig.containerClass} .openfront-character-image`);
+        if (img) {
+            img.classList.remove('active');
         }
     } else {
+        // Stop any other active radios first
+        stopAllRadios();
+        
         // Create and add the YouTube iframe
         const iframe = document.createElement('iframe');
         iframe.id = iframeId;
@@ -184,11 +212,10 @@ function toggleRadioMusic(radioConfig) {
         
         radioStates[radioConfig.id] = true;
         
-        // Update button text
-        const container = document.querySelector(`.${radioConfig.containerClass}`);
-        const titleElement = container?.querySelector('.openfront-audio-title');
-        if (titleElement) {
-            titleElement.innerHTML = `<span class="typing-text">${radioConfig.texts.playing}</span>`;
+        // Update visual state
+        const img = document.querySelector(`.${radioConfig.containerClass} .openfront-character-image`);
+        if (img) {
+            img.classList.add('active');
         }
         
         console.log(`${radioConfig.name} started with YouTube embed`);
@@ -203,14 +230,26 @@ function toggleRadioMusic(radioConfig) {
 function createRadioContainer(radio) {
     const container = document.createElement('div');
     container.className = radio.containerClass;
-    container.innerHTML = `
-        <img class="openfront-character-image" src="${chrome.runtime.getURL(`img/characters/${radio.character}`)}">
-        <span class="openfront-audio-title"><span class="typing-text">${radio.texts.stopped}</span></span>
-    `;
     
-    // Add click event listener
-    container.addEventListener('click', () => toggleRadioMusic(radio));
+    // Create image element with data attribute to identify which radio it belongs to
+    const img = document.createElement('img');
+    img.className = 'openfront-character-image';
+    img.src = chrome.runtime.getURL(`img/characters/${radio.character}`);
+    img.dataset.radioId = radio.id;
     
+    // Add click event listener to the container
+    container.addEventListener('click', () => {
+        toggleRadioMusic(radio);
+        
+        // Update active state visually
+        document.querySelectorAll('.openfront-character-image').forEach(img => {
+            if (img.dataset.radioId === radio.id) {
+                img.classList.toggle('active', radioStates[radio.id]);
+            }
+        });
+    });
+    
+    container.appendChild(img);
     return container;
 }
 
@@ -220,9 +259,15 @@ function createRadioContainer(radio) {
 function initializeRadios() {
     if (!radioConfig) return;
     
+    // Create a container for all radio buttons
+    const radioContainer = document.createElement('div');
+    radioContainer.className = 'openfront-radio-container';
+    document.body.appendChild(radioContainer);
+    
+    // Add each radio button to the container
     radioConfig.radios.forEach(radio => {
         const container = createRadioContainer(radio);
-        document.body.appendChild(container);
+        radioContainer.appendChild(container);
     });
 }
 
@@ -232,12 +277,28 @@ function initializeRadios() {
 function ensureRadioContainers() {
     if (!radioConfig) return;
     
+    // Check if the main radio container exists
+    let radioContainer = document.querySelector('.openfront-radio-container');
+    if (!radioContainer) {
+        console.log('Radio container not found, creating it again');
+        radioContainer = document.createElement('div');
+        radioContainer.className = 'openfront-radio-container';
+        document.body.appendChild(radioContainer);
+    }
+    
+    // Check if each radio button exists
     radioConfig.radios.forEach(radio => {
         const existingContainer = document.querySelector(`.${radio.containerClass}`);
         if (!existingContainer) {
             console.log(`${radio.name} button was not found, adding it again`);
             const container = createRadioContainer(radio);
-            document.body.appendChild(container);
+            radioContainer.appendChild(container);
+        }
+        
+        // Update active state visually
+        const img = document.querySelector(`.${radio.containerClass} .openfront-character-image`);
+        if (img) {
+            img.classList.toggle('active', radioStates[radio.id]);
         }
     });
 }
@@ -262,12 +323,19 @@ function cleanupRadioIframes() {
 function removeRadioContainers() {
     if (!radioConfig) return;
     
+    // Remove individual radio containers
     radioConfig.radios.forEach(radio => {
         const container = document.querySelector(`.${radio.containerClass}`);
         if (container) {
             container.remove();
         }
     });
+    
+    // Remove the main radio container
+    const radioContainer = document.querySelector('.openfront-radio-container');
+    if (radioContainer) {
+        radioContainer.remove();
+    }
 }
 
 // Initialize the extension
