@@ -19,14 +19,8 @@ async function loadRadioConfig() {
             // Generate container class
             radio.containerClass = `openfront-${radio.id}-container`;
             
-            // Generate title from name
+            // Generate title from name (used for iframe title attribute)
             radio.title = radio.name;
-            
-            // Generate texts
-            radio.texts = {
-                playing: `Turn off ${radio.name} 🤫`,
-                stopped: radio.name
-            };
             
             // Initialize state
             radioStates[radio.id] = false;
@@ -142,20 +136,21 @@ function updateDisplay() {
 }
 
 /**
- * Stop all active radios
+ * Stop all active radios and clean up iframes
+ * @param {boolean} updateVisuals - Whether to update the visual state of the radio buttons
  */
-function stopAllRadios() {
+function stopAllRadios(updateVisuals = true) {
     if (!radioConfig) return;
     
     radioConfig.radios.forEach(radio => {
-        if (radioStates[radio.id]) {
-            // Stop the music by removing the iframe
-            const iframeId = `${radio.id}-iframe`;
-            const existingIframe = document.getElementById(iframeId);
-            if (existingIframe) {
-                existingIframe.remove();
-            }
-            
+        // Stop the music by removing the iframe
+        const iframeId = `${radio.id}-iframe`;
+        const existingIframe = document.getElementById(iframeId);
+        if (existingIframe) {
+            existingIframe.remove();
+        }
+        
+        if (radioStates[radio.id] && updateVisuals) {
             radioStates[radio.id] = false;
             
             // Update visual state
@@ -193,16 +188,10 @@ function toggleRadioMusic(radioConfig) {
         // Stop any other active radios first
         stopAllRadios();
         
-        // Create and add the YouTube iframe
+        // Create and add the YouTube iframe (hidden but still playing audio)
         const iframe = document.createElement('iframe');
         iframe.id = iframeId;
-        iframe.width = '0';  // Hidden but still playing audio
-        iframe.height = '0';
-        iframe.style.position = 'absolute';
-        iframe.style.bottom = '0';
-        iframe.style.right = '0';
-        iframe.style.opacity = '0.01';  // Nearly invisible but still functional
-        iframe.style.pointerEvents = 'none';  // Prevent interaction
+        iframe.style.cssText = 'width:0; height:0; position:absolute; bottom:0; right:0; opacity:0.01; pointer-events:none;';
         iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
         iframe.src = radioConfig.youtubeUrl;
         iframe.title = radioConfig.title;
@@ -240,13 +229,6 @@ function createRadioContainer(radio) {
     // Add click event listener to the container
     container.addEventListener('click', () => {
         toggleRadioMusic(radio);
-        
-        // Update active state visually
-        document.querySelectorAll('.openfront-character-image').forEach(img => {
-            if (img.dataset.radioId === radio.id) {
-                img.classList.toggle('active', radioStates[radio.id]);
-            }
-        });
     });
     
     container.appendChild(img);
@@ -303,19 +285,6 @@ function ensureRadioContainers() {
     });
 }
 
-/**
- * Clean up all radio iframes
- */
-function cleanupRadioIframes() {
-    if (!radioConfig) return;
-    
-    radioConfig.radios.forEach(radio => {
-        const iframe = document.getElementById(`${radio.id}-iframe`);
-        if (iframe) {
-            iframe.remove();
-        }
-    });
-}
 
 /**
  * Remove all radio containers
@@ -372,7 +341,7 @@ async function initialize() {
         clearInterval(updateInterval);
         display.remove();
         removeRadioContainers();
-        cleanupRadioIframes();
+        stopAllRadios(false); // Clean up iframes without updating visuals
     });
     
     // Update when URL changes (for single-page app navigation)

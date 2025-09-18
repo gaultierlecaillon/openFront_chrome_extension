@@ -6,7 +6,11 @@
   "permissions": [],
   "content_scripts": [
     {
-      "matches": ["https://openfront.io/*"],
+      "matches": [
+        "https://openfront.io/*",
+        "http://localhost:9000/*",
+        "https://*.trycloudflare.com/*"
+      ],
       "css": ["styles.css"],
       "js": ["content.js"]
     }
@@ -19,7 +23,11 @@
         "img/characters/reggaeDub.png",
         "radio-config.json"
       ],
-      "matches": ["https://openfront.io/*"]
+      "matches": [
+        "https://openfront.io/*",
+        "http://localhost:9000/*",
+        "https://*.trycloudflare.com/*"
+      ]
     }
   ]
 }

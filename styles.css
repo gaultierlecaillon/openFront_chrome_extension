@@ -33,16 +33,13 @@
   z-index: 10000;
 }
 
-.openfront-lofi-radio-container,
-.openfront-phunk-radio-container,
-.openfront-reggae-radio-container {
+/* All radio containers share the same styling */
+[class*="openfront-"][class*="-radio-container"] {
   cursor: pointer;
   transition: transform 0.2s ease;
 }
 
-.openfront-lofi-radio-container:hover,
-.openfront-phunk-radio-container:hover,
-.openfront-reggae-radio-container:hover {
+[class*="openfront-"][class*="-radio-container"]:hover {
   transform: scale(1.1);
 }
 
@@ -83,28 +80,7 @@
   border-color: #60a5fa;
 }
 
+/* Audio title is hidden in minimal interface */
 .openfront-audio-title {
   display: none;
-}
-
-@keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
-}
-
-.typing-text {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  border-right: 2px solid #60a5fa;
-  animation: typing 1.5s steps(40, end),
-             blink-caret 0.75s step-end infinite;
-  margin: 0;
-  color: white;
-  font-weight: bold;
-}
-
-@keyframes blink-caret {
-  from, to { border-color: transparent }
-  50% { border-color: #60a5fa }
 }
